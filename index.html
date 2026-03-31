@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SACC — Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy: #1e3a5f;
+      --navy-light: #2a4a72;
+      --white: #ffffff;
+      --gray: #6b7280;
+      --border: #d1dae6;
+      --danger: #dc2626;
+      --success: #16a34a;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--white);
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ── Login card ── */
+    .card {
+      width: 360px;
+      text-align: center;
+    }
+
+    .sacc {
+      font-size: 64px;
+      font-weight: 700;
+      color: var(--navy);
+      letter-spacing: -1px;
+      line-height: 1;
+    }
+
+    .divider {
+      width: 40px;
+      height: 2px;
+      background: var(--navy);
+      margin: 12px auto 16px;
+      border-radius: 2px;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: var(--gray);
+      margin-bottom: 36px;
+      letter-spacing: 0.3px;
+    }
+
+    .field {
+      text-align: left;
+      margin-bottom: 14px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--navy);
+      margin-bottom: 6px;
+    }
+
+    .field input {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      color: var(--navy);
+      background: var(--white);
+      outline: none;
+      transition: border-color .15s;
+    }
+
+    .field input::placeholder { color: #b0bac8; }
+    .field input:focus { border-color: var(--navy); }
+
+    .input-wrap { position: relative; }
+    .input-wrap input { padding-right: 42px; }
+
+    .toggle-senha {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      color: #b0bac8;
+      display: flex;
+      align-items: center;
+      transition: color .15s;
+    }
+    .toggle-senha:hover { color: var(--navy); }
+
+    .btn-primary {
+      width: 100%;
+      margin-top: 8px;
+      padding: 12px;
+      background: var(--navy);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .15s, opacity .15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-primary:hover { background: var(--navy-light); }
+    .btn-primary:active { opacity: .9; }
+    .btn-primary:disabled { opacity: .6; cursor: not-allowed; }
+
+    .register-link {
+      margin-top: 20px;
+      font-size: 13px;
+      color: var(--gray);
+    }
+    .register-link a {
+      color: var(--navy);
+      font-weight: 500;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    .register-link a:hover { color: var(--navy-light); }
+
+    /* ── Mensagem de feedback ── */
+    .msg {
+      font-size: 12px;
+      margin-top: 10px;
+      padding: 9px 12px;
+      border-radius: 6px;
+      text-align: left;
+      display: none;
+    }
+    .msg.error   { background: #fef2f2; color: var(--danger); border: 1px solid #fecaca; display: block; }
+    .msg.success { background: #f0fdf4; color: var(--success); border: 1px solid #bbf7d0; display: block; }
+
+    /* ── Spinner ── */
+    .spinner {
+      width: 15px;
+      height: 15px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .6s linear infinite;
+      display: none;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Modal overlay ── */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s;
+      z-index: 100;
+    }
+    .overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    /* ── Modal box ── */
+    .modal {
+      background: var(--white);
+      border-radius: 10px;
+      width: 340px;
+      padding: 32px 32px 28px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+      transform: translateY(12px);
+      transition: transform .2s;
+    }
+    .overlay.open .modal { transform: translateY(0); }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+    .modal-header h2 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--navy);
+    }
+    .btn-close {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--gray);
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      transition: color .15s;
+    }
+    .btn-close:hover { color: var(--navy); }
+
+    /* ── Estado: já logado ── */
+    .card-logado { display: none; text-align: center; width: 360px; }
+    .logado-nome {
+      font-size: 13px;
+      color: var(--gray);
+      margin-bottom: 28px;
+    }
+    .logado-nome strong { color: var(--navy); }
+    .btn-sair {
+      background: none;
+      border: none;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      color: var(--gray);
+      cursor: pointer;
+      text-decoration: underline;
+      margin-top: 16px;
+      display: block;
+      width: 100%;
+    }
+    .btn-sair:hover { color: var(--navy); }
+  </style>
+</head>
+<body>
+
+<!-- ── Página de Login ── -->
+<div class="card">
+  <div class="sacc">SACC</div>
+  <div class="divider"></div>
+  <p class="subtitle">Sistema Administrativo</p>
+
+  <div class="field">
+    <label for="login-usuario">Usuário</label>
+    <input id="login-usuario" type="text" placeholder="Digite seu usuário" autocomplete="username"/>
+  </div>
+
+  <div class="field">
+    <label for="login-senha">Senha</label>
+    <div class="input-wrap">
+      <input id="login-senha" type="password" placeholder="Digite sua senha" autocomplete="current-password"/>
+      <button class="toggle-senha" type="button" onclick="toggleVisibilidade('login-senha', this)" tabindex="-1">
+        <svg class="ic-show" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+        </svg>
+        <svg class="ic-hide" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+          <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+          <line x1="1" y1="1" x2="23" y2="23"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <button class="btn-primary" id="btn-login" onclick="handleLogin()">
+    <span class="spinner" id="login-spinner"></span>
+    <span id="login-label">Entrar</span>
+  </button>
+
+  <div class="msg" id="login-msg"></div>
+
+  <div class="register-link">
+    <a onclick="abrirModal()">Cadastro de login</a>
+  </div>
+</div>
+
+<!-- ── Já logado ── -->
+<div class="card-logado" id="card-logado">
+  <div class="sacc">SACC</div>
+  <div class="divider"></div>
+  <p class="subtitle">Sistema Administrativo</p>
+  <p class="logado-nome">Logado como <strong id="logado-nome-txt"></strong></p>
+  <button class="btn-primary" onclick="irParaDashboard()">Entrar</button>
+  <button class="btn-sair" onclick="handleSair()">Sair desta conta</button>
+</div>
+
+<!-- ── Modal Cadastro ── -->
+<div class="overlay" id="overlay" onclick="fecharModalFora(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Cadastro de login</h2>
+      <button class="btn-close" onclick="fecharModal()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="field">
+      <label for="cad-usuario">Usuário</label>
+      <input id="cad-usuario" type="text" placeholder="Escolha um usuário" autocomplete="off"/>
+    </div>
+
+    <div class="field">
+      <label for="cad-senha">Senha</label>
+      <div class="input-wrap">
+        <input id="cad-senha" type="password" placeholder="Escolha uma senha" autocomplete="new-password"/>
+        <button class="toggle-senha" type="button" onclick="toggleVisibilidade('cad-senha', this)" tabindex="-1">
+          <svg class="ic-show" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+          </svg>
+          <svg class="ic-hide" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+            <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+            <line x1="1" y1="1" x2="23" y2="23"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <button class="btn-primary" id="btn-cadastrar" onclick="handleCadastro()" style="margin-top:4px">
+      <span class="spinner" id="cad-spinner"></span>
+      <span id="cad-label">Cadastrar</span>
+    </button>
+
+    <div class="msg" id="cad-msg"></div>
+  </div>
+</div>
+
+<script type="module">
+  // ─────────────────────────────────────────
+  // ⚙️  CONFIGURAÇÃO — preencha após criar o projeto no Supabase
+  // ─────────────────────────────────────────
+  const SUPABASE_URL      = 'https://uxtakyijomozrraazuxi.supabase.co'; // ← substitua
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV4dGFreWlqb21venJyYWF6dXhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5MzgyNDIsImV4cCI6MjA5MDUxNDI0Mn0.uKeMN7NdNaLk9cyeli9BBZLjTLkPFbPqKic1mFfIJss';                    // ← substitua
+
+  const headers = {
+    'Content-Type': 'application/json',
+    'apikey': SUPABASE_ANON_KEY,
+    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+  };
+
+  const STORAGE_KEY = 'sacc_usuario';
+
+  // ─────────────────────────────────────────
+  // Verifica sessão ao carregar a página
+  // ─────────────────────────────────────────
+  (function verificarSessao() {
+    const salvo = localStorage.getItem(STORAGE_KEY);
+    if (salvo) {
+      try {
+        const usuario = JSON.parse(salvo);
+        document.getElementById('card-logado').style.display = 'block';
+        document.querySelector('.card').style.display = 'none';
+        document.getElementById('logado-nome-txt').textContent = usuario.login;
+      } catch {
+        localStorage.removeItem(STORAGE_KEY);
+      }
+    }
+  })();
+
+  // ─────────────────────────────────────────
+  // Utilitários
+  // ─────────────────────────────────────────
+  function setLoading(btnId, spinnerId, labelId, loading) {
+    document.getElementById(btnId).disabled = loading;
+    document.getElementById(spinnerId).style.display = loading ? 'block' : 'none';
+    document.getElementById(labelId).style.opacity   = loading ? '0' : '1';
+  }
+
+  function showMsg(id, type, text) {
+    const el = document.getElementById(id);
+    el.className = `msg ${type}`;
+    el.textContent = text;
+  }
+
+  function hideMsg(id) {
+    const el = document.getElementById(id);
+    el.className = 'msg';
+    el.textContent = '';
+  }
+
+  window.toggleVisibilidade = function(inputId, btn) {
+    const input = document.getElementById(inputId);
+    const isPassword = input.type === 'password';
+    input.type = isPassword ? 'text' : 'password';
+    btn.querySelector('.ic-show').style.display = isPassword ? 'none' : '';
+    btn.querySelector('.ic-hide').style.display = isPassword ? '' : 'none';
+  };
+
+  // ─────────────────────────────────────────
+  // Modal
+  // ─────────────────────────────────────────
+  window.abrirModal = function() {
+    document.getElementById('overlay').classList.add('open');
+    document.getElementById('cad-usuario').focus();
+  };
+
+  window.fecharModal = function() {
+    document.getElementById('overlay').classList.remove('open');
+    document.getElementById('cad-usuario').value = '';
+    document.getElementById('cad-senha').value = '';
+    hideMsg('cad-msg');
+  };
+
+  window.fecharModalFora = function(e) {
+    if (e.target === document.getElementById('overlay')) fecharModal();
+  };
+
+  // ─────────────────────────────────────────
+  // Já logado — Entrar / Sair
+  // ─────────────────────────────────────────
+  window.irParaDashboard = function() {
+    window.location.href = 'dashboard.html';
+  };
+
+  window.handleSair = function() {
+    localStorage.removeItem(STORAGE_KEY);
+    document.getElementById('card-logado').style.display = 'none';
+    document.querySelector('.card').style.display = 'block';
+  };
+
+  // ─────────────────────────────────────────
+  // Cadastro — insere na tabela `usuarios`
+  // ─────────────────────────────────────────
+  window.handleCadastro = async function() {
+    const login = document.getElementById('cad-usuario').value.trim();
+    const senha = document.getElementById('cad-senha').value.trim();
+
+    hideMsg('cad-msg');
+
+    if (!login || !senha) {
+      showMsg('cad-msg', 'error', 'Preencha todos os campos.');
+      return;
+    }
+    if (senha.length < 4) {
+      showMsg('cad-msg', 'error', 'A senha deve ter ao menos 4 caracteres.');
+      return;
+    }
+
+    setLoading('btn-cadastrar', 'cad-spinner', 'cad-label', true);
+
+    try {
+      const checkRes = await fetch(
+        `${SUPABASE_URL}/rest/v1/usuarios?login=eq.${encodeURIComponent(login)}&select=id`,
+        { headers }
+      );
+      const existing = await checkRes.json();
+
+      if (existing.length > 0) {
+        showMsg('cad-msg', 'error', 'Este usuário já está cadastrado.');
+        return;
+      }
+
+      const insertRes = await fetch(`${SUPABASE_URL}/rest/v1/usuarios`, {
+        method: 'POST',
+        headers: { ...headers, 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ login, senha }),
+      });
+
+      if (!insertRes.ok) {
+        const err = await insertRes.json();
+        throw new Error(err.message || 'Erro ao cadastrar.');
+      }
+
+      showMsg('cad-msg', 'success', 'Cadastro realizado com sucesso!');
+      document.getElementById('cad-usuario').value = '';
+      document.getElementById('cad-senha').value = '';
+      setTimeout(() => fecharModal(), 1800);
+
+    } catch (err) {
+      showMsg('cad-msg', 'error', err.message || 'Erro inesperado.');
+    } finally {
+      setLoading('btn-cadastrar', 'cad-spinner', 'cad-label', false);
+    }
+  };
+
+  // ─────────────────────────────────────────
+  // Login — consulta a tabela `usuarios`
+  // ─────────────────────────────────────────
+  window.handleLogin = async function() {
+    const login = document.getElementById('login-usuario').value.trim();
+    const senha = document.getElementById('login-senha').value.trim();
+
+    hideMsg('login-msg');
+
+    if (!login || !senha) {
+      showMsg('login-msg', 'error', 'Preencha usuário e senha.');
+      return;
+    }
+
+    setLoading('btn-login', 'login-spinner', 'login-label', true);
+
+    try {
+      const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/usuarios?login=eq.${encodeURIComponent(login)}&senha=eq.${encodeURIComponent(senha)}&select=id,login`,
+        { headers }
+      );
+      const data = await res.json();
+
+      if (data.length === 0) {
+        showMsg('login-msg', 'error', 'Usuário ou senha incorretos.');
+        return;
+      }
+
+      // Salva no localStorage (persistente entre abas e reaberturas)
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data[0]));
+      showMsg('login-msg', 'success', 'Acesso autorizado. Redirecionando...');
+
+      setTimeout(() => {
+        window.location.href = 'dashboard.html';
+      }, 1000);
+
+    } catch (err) {
+      showMsg('login-msg', 'error', 'Erro de conexão com o servidor.');
+    } finally {
+      setLoading('btn-login', 'login-spinner', 'login-label', false);
+    }
+  };
+
+  // Enter
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      if (document.getElementById('overlay').classList.contains('open')) {
+        window.handleCadastro();
+      } else if (document.getElementById('card-logado').style.display === 'block') {
+        window.irParaDashboard();
+      } else {
+        window.handleLogin();
+      }
+    }
+  });
+
+  // Esc fecha modal
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') fecharModal();
+  });
+</script>
+</body>
+</html>

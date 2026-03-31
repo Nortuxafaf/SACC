@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SACC — Funcionários</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:        #1e3a5f;
+      --navy-light:  #2a4a72;
+      --white:       #ffffff;
+      --gray:        #6b7280;
+      --gray-light:  #f3f5f8;
+      --border:      #d1dae6;
+      --danger:      #dc2626;
+      --danger-bg:   #fef2f2;
+      --danger-border:#fecaca;
+      --success:     #16a34a;
+      --success-bg:  #f0fdf4;
+      --success-border:#bbf7d0;
+      --row-hover:   #f0f4fa;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--gray-light);
+      color: var(--navy);
+      min-height: 100vh;
+    }
+
+    /* ── Topbar ── */
+    .topbar {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--navy);
+      letter-spacing: -0.5px;
+    }
+
+    .topbar-sep {
+      width: 1px;
+      height: 20px;
+      background: var(--border);
+    }
+
+    .topbar-title {
+      font-size: 13px;
+      color: var(--gray);
+      font-weight: 400;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .topbar-user {
+      font-size: 12px;
+      color: var(--gray);
+    }
+
+    .topbar-user strong {
+      color: var(--navy);
+      font-weight: 600;
+    }
+
+    .btn-sair-top {
+      font-size: 12px;
+      color: var(--gray);
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 5px 12px;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: all .15s;
+    }
+    .btn-sair-top:hover { border-color: var(--navy); color: var(--navy); }
+
+    /* ── Content ── */
+    .content {
+      max-width: 900px;
+      margin: 36px auto;
+      padding: 0 24px;
+    }
+
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .page-header h1 {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--navy);
+    }
+
+    .page-header p {
+      font-size: 12px;
+      color: var(--gray);
+      margin-top: 2px;
+    }
+
+    .btn-add {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 9px 18px;
+      background: var(--navy);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .btn-add:hover { background: var(--navy-light); }
+
+    /* ── Search bar ── */
+    .search-wrap {
+      margin-bottom: 14px;
+      position: relative;
+    }
+
+    .search-wrap svg {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #b0bac8;
+      pointer-events: none;
+    }
+
+    .search-wrap input {
+      width: 100%;
+      padding: 10px 14px 10px 38px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      color: var(--navy);
+      background: var(--white);
+      outline: none;
+      transition: border-color .15s;
+    }
+    .search-wrap input::placeholder { color: #b0bac8; }
+    .search-wrap input:focus { border-color: var(--navy); }
+
+    /* ── Table ── */
+    .table-wrap {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead tr {
+      background: var(--gray-light);
+      border-bottom: 1px solid var(--border);
+    }
+
+    thead th {
+      text-align: left;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--gray);
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      padding: 11px 16px;
+    }
+
+    thead th.th-action { text-align: right; }
+
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: background .12s;
+    }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--row-hover); }
+
+    tbody td {
+      padding: 13px 16px;
+      font-size: 13px;
+      color: var(--navy);
+    }
+
+    .td-matricula {
+      font-weight: 500;
+      color: var(--gray);
+      font-size: 12px;
+      font-family: 'Inter', monospace;
+    }
+
+    .td-setor {
+      display: inline-block;
+      font-size: 11px;
+      padding: 3px 9px;
+      border-radius: 20px;
+      background: #e8eef7;
+      color: var(--navy);
+      font-weight: 500;
+    }
+
+    .td-action {
+      text-align: right;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 4px;
+    }
+
+    .btn-edit {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #b0bac8;
+      padding: 4px;
+      border-radius: 4px;
+      display: inline-flex;
+      align-items: center;
+      transition: color .15s, background .15s;
+    }
+    .btn-edit:hover { color: var(--navy); background: #e8eef7; }
+
+    .btn-remove {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #b0bac8;
+      padding: 4px;
+      border-radius: 4px;
+      display: inline-flex;
+      align-items: center;
+      transition: color .15s, background .15s;
+    }
+    .btn-remove:hover { color: var(--danger); background: var(--danger-bg); }
+
+    /* ── Empty state ── */
+    .empty {
+      text-align: center;
+      padding: 52px 24px;
+      color: var(--gray);
+    }
+    .empty svg { margin-bottom: 12px; opacity: .35; }
+    .empty p { font-size: 13px; }
+
+    /* ── Loading ── */
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: var(--gray);
+      font-size: 13px;
+    }
+
+    /* ── Feedback msg ── */
+    .msg {
+      font-size: 12px;
+      margin-top: 10px;
+      padding: 9px 12px;
+      border-radius: 6px;
+      text-align: left;
+      display: none;
+    }
+    .msg.error   { background: var(--danger-bg);  color: var(--danger);  border: 1px solid var(--danger-border);  display: block; }
+    .msg.success { background: var(--success-bg); color: var(--success); border: 1px solid var(--success-border); display: block; }
+
+    /* ── Spinner ── */
+    .spinner {
+      width: 14px; height: 14px;
+      border: 2px solid rgba(255,255,255,.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .6s linear infinite;
+      display: none;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Modal shared ── */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.32);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity .2s;
+      z-index: 100;
+    }
+    .overlay.open { opacity: 1; pointer-events: all; }
+
+    .modal {
+      background: var(--white);
+      border-radius: 10px;
+      padding: 32px;
+      box-shadow: 0 8px 32px rgba(0,0,0,.12);
+      transform: translateY(12px);
+      transition: transform .2s;
+      width: 420px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .overlay.open .modal { transform: translateY(0); }
+
+    .modal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 24px;
+    }
+    .modal-header h2 { font-size: 16px; font-weight: 600; color: var(--navy); }
+
+    .btn-close {
+      background: none; border: none; cursor: pointer;
+      color: var(--gray); padding: 2px;
+      display: flex; align-items: center;
+      transition: color .15s;
+    }
+    .btn-close:hover { color: var(--navy); }
+
+    /* ── Form fields ── */
+    .field { margin-bottom: 14px; text-align: left; }
+    .field label {
+      display: block; font-size: 12px; font-weight: 500;
+      color: var(--navy); margin-bottom: 6px;
+    }
+    .field input, .field textarea, .field select {
+      width: 100%;
+      padding: 10px 13px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      color: var(--navy);
+      background: var(--white);
+      outline: none;
+      transition: border-color .15s;
+    }
+    .field input::placeholder,
+    .field textarea::placeholder { color: #b0bac8; }
+    .field input:focus,
+    .field textarea:focus,
+    .field select:focus { border-color: var(--navy); }
+    .field textarea { resize: vertical; min-height: 90px; }
+
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    .btn-primary {
+      width: 100%; margin-top: 6px; padding: 11px;
+      background: var(--navy); color: #fff;
+      border: none; border-radius: 6px;
+      font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: background .15s;
+    }
+    .btn-primary:hover { background: var(--navy-light); }
+    .btn-primary:disabled { opacity: .6; cursor: not-allowed; }
+
+    /* ── Profile modal ── */
+    .profile-modal { width: 480px; }
+
+    .profile-top {
+      display: flex; align-items: center; gap: 16px;
+      margin-bottom: 24px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .profile-avatar {
+      width: 52px; height: 52px; border-radius: 50%;
+      background: #e8eef7;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; font-weight: 700; color: var(--navy);
+      flex-shrink: 0;
+    }
+
+    .profile-name { font-size: 17px; font-weight: 600; color: var(--navy); }
+    .profile-sub  { font-size: 12px; color: var(--gray); margin-top: 2px; }
+
+    .profile-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px 24px;
+      margin-bottom: 24px;
+    }
+
+    .profile-item label {
+      display: block; font-size: 11px; font-weight: 600;
+      color: var(--gray); letter-spacing: .6px;
+      text-transform: uppercase; margin-bottom: 3px;
+    }
+    .profile-item span {
+      font-size: 13px; color: var(--navy); font-weight: 500;
+    }
+
+    .obs-section h3 {
+      font-size: 12px; font-weight: 600; color: var(--gray);
+      letter-spacing: .6px; text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .btn-save-obs {
+      margin-top: 8px;
+      padding: 9px 20px;
+      background: var(--navy); color: #fff;
+      border: none; border-radius: 6px;
+      font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600;
+      cursor: pointer;
+      transition: background .15s;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .btn-save-obs:hover { background: var(--navy-light); }
+    .btn-save-obs:disabled { opacity: .6; cursor: not-allowed; }
+
+    /* ── Confirm dialog ── */
+    .confirm-modal { width: 340px; }
+    .confirm-modal p { font-size: 14px; color: var(--gray); margin-bottom: 24px; line-height: 1.5; }
+    .confirm-btns { display: flex; gap: 10px; }
+    .btn-cancel {
+      flex: 1; padding: 10px;
+      background: none; border: 1px solid var(--border);
+      border-radius: 6px; font-family: 'Inter', sans-serif;
+      font-size: 13px; font-weight: 500; color: var(--navy);
+      cursor: pointer; transition: all .15s;
+    }
+    .btn-cancel:hover { border-color: var(--navy); }
+    .btn-confirm-del {
+      flex: 1; padding: 10px;
+      background: var(--danger); color: #fff;
+      border: none; border-radius: 6px;
+      font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: background .15s;
+    }
+    .btn-confirm-del:hover { background: #b91c1c; }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed; bottom: 24px; right: 24px;
+      background: var(--navy); color: #fff;
+      font-size: 13px; padding: 11px 18px;
+      border-radius: 7px;
+      box-shadow: 0 4px 16px rgba(0,0,0,.15);
+      opacity: 0; transform: translateY(8px);
+      transition: opacity .2s, transform .2s;
+      pointer-events: none;
+      z-index: 999;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+  </style>
+</head>
+<body>
+
+<!-- ── Topbar ── -->
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="logo">SACC</span>
+    <div class="topbar-sep"></div>
+    <span class="topbar-title">Sistema Administrativo</span>
+  </div>
+  <div class="topbar-right">
+    <span class="topbar-user">Olá, <strong id="topbar-nome">—</strong></span>
+    <button class="btn-sair-top" onclick="sair()">Sair</button>
+  </div>
+</div>
+
+<!-- ── Content ── -->
+<div class="content">
+  <div class="page-header">
+    <div>
+      <h1>Funcionários</h1>
+      <p id="count-label">Carregando...</p>
+    </div>
+    <button class="btn-add" onclick="abrirModalAdd()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Adicionar funcionário
+    </button>
+  </div>
+
+  <div class="search-wrap">
+    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input id="search-input" type="text" placeholder="Buscar por nome, matrícula ou setor..." oninput="filtrarTabela()"/>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Matrícula</th>
+          <th>Nome</th>
+          <th>Setor</th>
+          <th class="th-action">Ação</th>
+        </tr>
+      </thead>
+      <tbody id="tabela-body">
+        <tr><td colspan="4"><div class="loading">Carregando funcionários...</div></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ── Modal: Adicionar funcionário ── -->
+<div class="overlay" id="overlay-add" onclick="fecharFora(event,'overlay-add')">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Adicionar funcionário</h2>
+      <button class="btn-close" onclick="fecharModal('overlay-add')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div class="field">
+      <label for="add-nome">Nome completo</label>
+      <input id="add-nome" type="text" placeholder="Ex: João da Silva"/>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label for="add-matricula">Matrícula</label>
+        <input id="add-matricula" type="text" placeholder="Ex: 00123"/>
+      </div>
+      <div class="field">
+        <label for="add-setor">Setor</label>
+        <input id="add-setor" type="text" placeholder="Ex: TI"/>
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label for="add-cpf">CPF</label>
+        <input id="add-cpf" type="text" placeholder="000.000.000-00" maxlength="14"/>
+      </div>
+      <div class="field">
+        <label for="add-nascimento">Data de Nascimento</label>
+        <input id="add-nascimento" type="date"/>
+      </div>
+    </div>
+
+    <button class="btn-primary" id="btn-add-submit" onclick="handleAdicionarFuncionario()">
+      <span class="spinner" id="add-spinner"></span>
+      <span id="add-label">Cadastrar</span>
+    </button>
+    <div class="msg" id="add-msg"></div>
+  </div>
+</div>
+
+<!-- ── Modal: Perfil do funcionário ── -->
+<div class="overlay" id="overlay-perfil" onclick="fecharFora(event,'overlay-perfil')">
+  <div class="modal profile-modal">
+    <div class="modal-header">
+      <h2>Perfil do funcionário</h2>
+      <button class="btn-close" onclick="fecharModal('overlay-perfil')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div class="profile-top">
+      <div class="profile-avatar" id="perfil-avatar">—</div>
+      <div>
+        <div class="profile-name" id="perfil-nome">—</div>
+        <div class="profile-sub" id="perfil-setor">—</div>
+      </div>
+    </div>
+
+    <div class="profile-grid">
+      <div class="profile-item">
+        <label>Matrícula</label>
+        <span id="perfil-matricula">—</span>
+      </div>
+      <div class="profile-item">
+        <label>Setor</label>
+        <span id="perfil-setor2">—</span>
+      </div>
+      <div class="profile-item">
+        <label>CPF</label>
+        <span id="perfil-cpf">—</span>
+      </div>
+      <div class="profile-item">
+        <label>Data de Nascimento</label>
+        <span id="perfil-nascimento">—</span>
+      </div>
+    </div>
+
+    <div class="obs-section">
+      <h3>Observação</h3>
+      <div class="field">
+        <textarea id="perfil-obs" placeholder="Digite uma observação sobre o funcionário..."></textarea>
+      </div>
+      <button class="btn-save-obs" id="btn-salvar-obs" onclick="handleSalvarObs()">
+        <span class="spinner" id="obs-spinner"></span>
+        <span id="obs-label">Salvar observação</span>
+      </button>
+      <div class="msg" id="obs-msg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Modal: Editar funcionário ── -->
+<div class="overlay" id="overlay-edit" onclick="fecharFora(event,'overlay-edit')">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Editar funcionário</h2>
+      <button class="btn-close" onclick="fecharModal('overlay-edit')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div class="field">
+      <label for="edit-nome">Nome completo</label>
+      <input id="edit-nome" type="text" placeholder="Ex: João da Silva"/>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label for="edit-matricula">Matrícula</label>
+        <input id="edit-matricula" type="text" placeholder="Ex: 00123"/>
+      </div>
+      <div class="field">
+        <label for="edit-setor">Setor</label>
+        <input id="edit-setor" type="text" placeholder="Ex: TI"/>
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label for="edit-cpf">CPF</label>
+        <input id="edit-cpf" type="text" placeholder="000.000.000-00" maxlength="14"/>
+      </div>
+      <div class="field">
+        <label for="edit-nascimento">Data de Nascimento</label>
+        <input id="edit-nascimento" type="date"/>
+      </div>
+    </div>
+
+    <button class="btn-primary" id="btn-edit-submit" onclick="handleSalvarEdicao()">
+      <span class="spinner" id="edit-spinner"></span>
+      <span id="edit-label">Salvar alterações</span>
+    </button>
+    <div class="msg" id="edit-msg"></div>
+  </div>
+</div>
+
+<!-- ── Modal: Confirmar remoção ── -->
+<div class="overlay" id="overlay-confirm" onclick="fecharFora(event,'overlay-confirm')">
+  <div class="modal confirm-modal">
+    <div class="modal-header">
+      <h2>Remover funcionário</h2>
+      <button class="btn-close" onclick="fecharModal('overlay-confirm')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <p id="confirm-texto">Tem certeza que deseja remover este funcionário? Esta ação não pode ser desfeita.</p>
+    <div class="confirm-btns">
+      <button class="btn-cancel" onclick="fecharModal('overlay-confirm')">Cancelar</button>
+      <button class="btn-confirm-del" id="btn-confirm-del" onclick="handleConfirmarRemocao()">Remover</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Toast ── -->
+<div class="toast" id="toast"></div>
+
+<script type="module">
+  // ─────────────────────────────────────────
+  // ⚙️  CONFIGURAÇÃO
+  // ─────────────────────────────────────────
+  const SUPABASE_URL      = 'https://uxtakyijomozrraazuxi.supabase.co'; // ← substitua
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV4dGFreWlqb21venJyYWF6dXhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5MzgyNDIsImV4cCI6MjA5MDUxNDI0Mn0.uKeMN7NdNaLk9cyeli9BBZLjTLkPFbPqKic1mFfIJss';                    // ← substitua
+
+  const headers = {
+    'Content-Type': 'application/json',
+    'apikey': SUPABASE_ANON_KEY,
+    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+  };
+
+  // ─────────────────────────────────────────
+  // Proteção de rota — redireciona se não logado
+  // ─────────────────────────────────────────
+  const usuarioLogado = JSON.parse(localStorage.getItem('sacc_usuario') || 'null');
+  if (!usuarioLogado) {
+    window.location.href = 'login.html';
+  } else {
+    document.getElementById('topbar-nome').textContent = usuarioLogado.login;
+  }
+
+  // ─────────────────────────────────────────
+  // Estado
+  // ─────────────────────────────────────────
+  let funcionarios = [];
+  let funcionarioSelecionadoId = null;
+  let funcionarioParaRemoverId = null;
+
+  // ─────────────────────────────────────────
+  // Utilitários
+  // ─────────────────────────────────────────
+  function showMsg(id, type, text) {
+    const el = document.getElementById(id);
+    el.className = `msg ${type}`;
+    el.textContent = text;
+  }
+  function hideMsg(id) {
+    const el = document.getElementById(id);
+    el.className = 'msg';
+    el.textContent = '';
+  }
+
+  function setLoading(btnId, spinnerId, labelId, loading) {
+    document.getElementById(btnId).disabled = loading;
+    document.getElementById(spinnerId).style.display = loading ? 'inline-block' : 'none';
+    document.getElementById(labelId).style.opacity   = loading ? '0' : '1';
+  }
+
+  function toast(msg) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 2800);
+  }
+
+  function formatarCPF(v) {
+    return v.replace(/\D/g,'')
+      .replace(/(\d{3})(\d)/,'$1.$2')
+      .replace(/(\d{3})(\d)/,'$1.$2')
+      .replace(/(\d{3})(\d{1,2})$/,'$1-$2');
+  }
+
+  function formatarData(iso) {
+    if (!iso) return '—';
+    const [y,m,d] = iso.split('-');
+    return `${d}/${m}/${y}`;
+  }
+
+  function inicialNome(nome) {
+    const partes = nome.trim().split(' ');
+    if (partes.length >= 2) return (partes[0][0] + partes[1][0]).toUpperCase();
+    return partes[0][0].toUpperCase();
+  }
+
+  // ─────────────────────────────────────────
+  // Modais
+  // ─────────────────────────────────────────
+  window.fecharModal = function(id) {
+    document.getElementById(id).classList.remove('open');
+  };
+  window.fecharFora = function(e, id) {
+    if (e.target === document.getElementById(id)) fecharModal(id);
+  };
+  window.abrirModalAdd = function() {
+    ['add-nome','add-matricula','add-setor','add-cpf'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('add-nascimento').value = '';
+    hideMsg('add-msg');
+    document.getElementById('overlay-add').classList.add('open');
+    document.getElementById('add-nome').focus();
+  };
+
+  // ─────────────────────────────────────────
+  // Carregar funcionários
+  // ─────────────────────────────────────────
+  async function carregarFuncionarios() {
+    try {
+      const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/funcionarios?select=*&order=nome.asc`,
+        { headers }
+      );
+      funcionarios = await res.json();
+      renderTabela(funcionarios);
+    } catch {
+      document.getElementById('tabela-body').innerHTML =
+        `<tr><td colspan="4"><div class="loading">Erro ao carregar dados.</div></td></tr>`;
+    }
+  }
+
+  // ─────────────────────────────────────────
+  // Renderizar tabela
+  // ─────────────────────────────────────────
+  function renderTabela(lista) {
+    const total = funcionarios.length;
+    document.getElementById('count-label').textContent =
+      total === 0 ? 'Nenhum funcionário cadastrado'
+      : total === 1 ? '1 funcionário cadastrado'
+      : `${total} funcionários cadastrados`;
+
+    const tbody = document.getElementById('tabela-body');
+
+    if (lista.length === 0) {
+      tbody.innerHTML = `
+        <tr><td colspan="4">
+          <div class="empty">
+            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <p>Nenhum funcionário encontrado.</p>
+          </div>
+        </td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = lista.map(f => `
+      <tr onclick="abrirPerfil('${f.id}')">
+        <td class="td-matricula">${f.matricula || '—'}</td>
+        <td>${f.nome}</td>
+        <td><span class="td-setor">${f.setor || '—'}</span></td>
+        <td class="td-action">
+          <button class="btn-edit" title="Editar" onclick="abrirModalEditar(event,'${f.id}')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button class="btn-remove" title="Remover" onclick="pedirRemocao(event,'${f.id}','${f.nome.replace(/'/g,"\\'")}')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+          </button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  // ─────────────────────────────────────────
+  // Busca / filtro
+  // ─────────────────────────────────────────
+  window.filtrarTabela = function() {
+    const q = document.getElementById('search-input').value.toLowerCase();
+    const filtrados = funcionarios.filter(f =>
+      f.nome.toLowerCase().includes(q) ||
+      (f.matricula || '').toLowerCase().includes(q) ||
+      (f.setor || '').toLowerCase().includes(q)
+    );
+    renderTabela(filtrados);
+  };
+
+  // ─────────────────────────────────────────
+  // Adicionar funcionário
+  // ─────────────────────────────────────────
+  window.handleAdicionarFuncionario = async function() {
+    const nome       = document.getElementById('add-nome').value.trim();
+    const matricula  = document.getElementById('add-matricula').value.trim();
+    const setor      = document.getElementById('add-setor').value.trim();
+    const cpf        = document.getElementById('add-cpf').value.trim();
+    const nascimento = document.getElementById('add-nascimento').value;
+
+    hideMsg('add-msg');
+
+    if (!nome || !matricula || !setor) {
+      showMsg('add-msg', 'error', 'Nome, matrícula e setor são obrigatórios.');
+      return;
+    }
+
+    setLoading('btn-add-submit', 'add-spinner', 'add-label', true);
+
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/funcionarios`, {
+        method: 'POST',
+        headers: { ...headers, 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ nome, matricula, setor, cpf, data_nascimento: nascimento || null }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.message || 'Erro ao cadastrar.');
+      }
+
+      fecharModal('overlay-add');
+      toast('Funcionário cadastrado com sucesso!');
+      await carregarFuncionarios();
+
+    } catch (err) {
+      showMsg('add-msg', 'error', err.message || 'Erro inesperado.');
+    } finally {
+      setLoading('btn-add-submit', 'add-spinner', 'add-label', false);
+    }
+  };
+
+  // ─────────────────────────────────────────
+  // Abrir perfil
+  // ─────────────────────────────────────────
+  window.abrirPerfil = function(id) {
+    const f = funcionarios.find(x => String(x.id) === String(id));
+    if (!f) return;
+
+    funcionarioSelecionadoId = f.id;
+
+    document.getElementById('perfil-avatar').textContent    = inicialNome(f.nome);
+    document.getElementById('perfil-nome').textContent      = f.nome;
+    document.getElementById('perfil-setor').textContent     = f.setor || '—';
+    document.getElementById('perfil-matricula').textContent = f.matricula || '—';
+    document.getElementById('perfil-setor2').textContent    = f.setor || '—';
+    document.getElementById('perfil-cpf').textContent       = f.cpf || '—';
+    document.getElementById('perfil-nascimento').textContent = formatarData(f.data_nascimento);
+    document.getElementById('perfil-obs').value             = f.observacao || '';
+    hideMsg('obs-msg');
+
+    document.getElementById('overlay-perfil').classList.add('open');
+  };
+
+  // ─────────────────────────────────────────
+  // Salvar observação
+  // ─────────────────────────────────────────
+  window.handleSalvarObs = async function() {
+    const obs = document.getElementById('perfil-obs').value.trim();
+    hideMsg('obs-msg');
+
+    document.getElementById('btn-salvar-obs').disabled = true;
+    document.getElementById('obs-spinner').style.display = 'inline-block';
+    document.getElementById('obs-label').style.opacity = '0';
+
+    try {
+      const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/funcionarios?id=eq.${funcionarioSelecionadoId}`,
+        {
+          method: 'PATCH',
+          headers: { ...headers, 'Prefer': 'return=minimal' },
+          body: JSON.stringify({ observacao: obs }),
+        }
+      );
+
+      if (!res.ok) throw new Error('Erro ao salvar.');
+
+      // Atualiza local
+      const idx = funcionarios.findIndex(x => String(x.id) === String(funcionarioSelecionadoId));
+      if (idx !== -1) funcionarios[idx].observacao = obs;
+
+      showMsg('obs-msg', 'success', 'Observação salva!');
+      setTimeout(() => hideMsg('obs-msg'), 2500);
+
+    } catch (err) {
+      showMsg('obs-msg', 'error', 'Erro ao salvar observação.');
+    } finally {
+      document.getElementById('btn-salvar-obs').disabled = false;
+      document.getElementById('obs-spinner').style.display = 'none';
+      document.getElementById('obs-label').style.opacity = '1';
+    }
+  };
+
+  // ─────────────────────────────────────────
+  // Abrir modal de edição
+  // ─────────────────────────────────────────
+  window.abrirModalEditar = function(e, id) {
+    e.stopPropagation();
+    const f = funcionarios.find(x => String(x.id) === String(id));
+    if (!f) return;
+
+    funcionarioSelecionadoId = f.id;
+
+    document.getElementById('edit-nome').value       = f.nome || '';
+    document.getElementById('edit-matricula').value  = f.matricula || '';
+    document.getElementById('edit-setor').value      = f.setor || '';
+    document.getElementById('edit-cpf').value        = f.cpf || '';
+    document.getElementById('edit-nascimento').value = f.data_nascimento || '';
+    hideMsg('edit-msg');
+
+    document.getElementById('overlay-edit').classList.add('open');
+    document.getElementById('edit-nome').focus();
+  };
+
+  // ─────────────────────────────────────────
+  // Salvar edição
+  // ─────────────────────────────────────────
+  window.handleSalvarEdicao = async function() {
+    const nome       = document.getElementById('edit-nome').value.trim();
+    const matricula  = document.getElementById('edit-matricula').value.trim();
+    const setor      = document.getElementById('edit-setor').value.trim();
+    const cpf        = document.getElementById('edit-cpf').value.trim();
+    const nascimento = document.getElementById('edit-nascimento').value;
+
+    hideMsg('edit-msg');
+
+    if (!nome || !matricula || !setor) {
+      showMsg('edit-msg', 'error', 'Nome, matrícula e setor são obrigatórios.');
+      return;
+    }
+
+    setLoading('btn-edit-submit', 'edit-spinner', 'edit-label', true);
+
+    try {
+      const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/funcionarios?id=eq.${funcionarioSelecionadoId}`,
+        {
+          method: 'PATCH',
+          headers: { ...headers, 'Prefer': 'return=minimal' },
+          body: JSON.stringify({ nome, matricula, setor, cpf, data_nascimento: nascimento || null }),
+        }
+      );
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.message || 'Erro ao salvar.');
+      }
+
+      fecharModal('overlay-edit');
+      toast('Funcionário atualizado com sucesso!');
+      await carregarFuncionarios();
+
+    } catch (err) {
+      showMsg('edit-msg', 'error', err.message || 'Erro inesperado.');
+    } finally {
+      setLoading('btn-edit-submit', 'edit-spinner', 'edit-label', false);
+    }
+  };
+
+  // ─────────────────────────────────────────
+  // Remover funcionário
+  // ─────────────────────────────────────────
+  window.pedirRemocao = function(e, id, nome) {
+    e.stopPropagation();
+    funcionarioParaRemoverId = id;
+    document.getElementById('confirm-texto').textContent =
+      `Tem certeza que deseja remover "${nome}"? Esta ação não pode ser desfeita.`;
+    document.getElementById('overlay-confirm').classList.add('open');
+  };
+
+  window.handleConfirmarRemocao = async function() {
+    const btn = document.getElementById('btn-confirm-del');
+    btn.disabled = true;
+    btn.textContent = 'Removendo...';
+
+    try {
+      const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/funcionarios?id=eq.${funcionarioParaRemoverId}`,
+        { method: 'DELETE', headers }
+      );
+
+      if (!res.ok) throw new Error();
+
+      fecharModal('overlay-confirm');
+      toast('Funcionário removido.');
+      await carregarFuncionarios();
+
+    } catch {
+      fecharModal('overlay-confirm');
+      toast('Erro ao remover funcionário.');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Remover';
+    }
+  };
+
+  // ─────────────────────────────────────────
+  // Sair
+  // ─────────────────────────────────────────
+  window.sair = function() {
+    localStorage.removeItem('sacc_usuario');
+    window.location.href = 'login.html';
+  };
+
+  // ─────────────────────────────────────────
+  // Máscara CPF
+  // ─────────────────────────────────────────
+  document.getElementById('add-cpf').addEventListener('input', function() {
+    this.value = formatarCPF(this.value);
+  });
+
+  document.getElementById('edit-cpf').addEventListener('input', function() {
+    this.value = formatarCPF(this.value);
+  });
+
+  // Esc fecha modais
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      ['overlay-add','overlay-edit','overlay-perfil','overlay-confirm'].forEach(id => fecharModal(id));
+    }
+  });
+
+  // ─────────────────────────────────────────
+  // Init
+  // ─────────────────────────────────────────
+  carregarFuncionarios();
+</script>
+</body>
+</html>
