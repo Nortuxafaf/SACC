@@ -245,6 +245,64 @@
       font-size: 11px;
     }
 
+    /* ── Filtros ── */
+    .filters-bar {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 16px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: flex-end;
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .filter-group label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--navy);
+    }
+
+    .filter-group select {
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      color: var(--navy);
+      background: var(--white);
+      cursor: pointer;
+      min-width: 150px;
+    }
+
+    .filter-group select:focus {
+      border-color: var(--navy);
+      outline: none;
+    }
+
+    .btn-limpar-filtros {
+      padding: 8px 12px;
+      background: var(--gray-light);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--navy);
+      cursor: pointer;
+      transition: all .15s;
+    }
+
+    .btn-limpar-filtros:hover {
+      background: var(--border);
+      color: var(--navy);
+    }
     
     /* ── Tabela Férias ── */
     .table-wrap {
@@ -452,7 +510,7 @@
     .modal-func-sub  { font-size: 11px; color: var(--gray); margin-top: 1px; }
 
     /* ── Form fields ── */
-    .field { margin-bottom: 14px; text-align: left; }
+    .field { margin-bottom: 14px; text-align: left; position: relative; }
     .field label {
       display: block; font-size: 12px; font-weight: 500;
       color: var(--navy); margin-bottom: 6px;
@@ -475,10 +533,64 @@
     .field textarea:focus,
     .field select:focus { border-color: var(--navy); }
 
+    .field input:disabled {
+      background: var(--gray-light);
+      cursor: not-allowed;
+    }
+
     .field-hint {
       font-size: 11px;
       color: var(--gray);
       margin-top: 4px;
+    }
+
+    /* ── Autocomplete dropdown ── */
+    .autocomplete-list {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-top: none;
+      border-radius: 0 0 6px 6px;
+      max-height: 200px;
+      overflow-y: auto;
+      display: none;
+      z-index: 101;
+      box-shadow: 0 4px 12px rgba(0,0,0,.1);
+    }
+
+    .autocomplete-list.show {
+      display: block;
+    }
+
+    .autocomplete-item {
+      padding: 10px 13px;
+      cursor: pointer;
+      border-bottom: 1px solid var(--gray-light);
+      transition: background .1s;
+      font-size: 13px;
+      color: var(--navy);
+    }
+
+    .autocomplete-item:last-child {
+      border-bottom: none;
+    }
+
+    .autocomplete-item:hover,
+    .autocomplete-item.selected {
+      background: var(--gray-light);
+    }
+
+    .autocomplete-item-nome {
+      font-weight: 600;
+    }
+
+    .autocomplete-item-sub {
+      font-size: 11px;
+      color: var(--gray);
+      margin-top: 2px;
     }
 
     /* ── Botões modais ── */
@@ -525,6 +637,7 @@
       <a href="dashboard.html" class="nav-link">Funcionários</a>
       <a href="bancohoras.html" class="nav-link">Banco de Horas</a>
       <a href="ferias.html" class="nav-link active">Férias</a>
+	   <a href="escala.html" class="nav-link">Escala</a>
     </nav>
   </div>
   <div class="topbar-right">
@@ -579,7 +692,27 @@
     </div>
   </div>
 
-  
+  <!-- ── Filtros ── -->
+  <div class="filters-bar">
+    <div class="filter-group">
+      <label for="filter-setor">Filtrar por Setor</label>
+      <select id="filter-setor" onchange="aplicarFiltros()">
+        <option value="">Todos os setores</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label for="filter-status">Status das Férias</label>
+      <select id="filter-status" onchange="aplicarFiltros()">
+        <option value="">Todos</option>
+        <option value="em-ferias">Em Férias</option>
+        <option value="pendente">Pendente</option>
+        <option value="finalizado">Finalizado</option>
+      </select>
+    </div>
+
+    <button class="btn-limpar-filtros" onclick="limparFiltros()">Limpar Filtros</button>
+  </div>
 
   <!-- ── Tabela Férias ── -->
   <div class="table-wrap">
@@ -607,7 +740,7 @@
   <div class="modal">
     <div class="modal-header">
       <h2>Adicionar Férias</h2>
-      <button class="btn-close" onclick="fecharModal('overlay-add')">
+      <button class="btn-close" onclick="fecharModal('overlay-add')" type="button">
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
@@ -621,23 +754,28 @@
       </div>
 
       <div class="field">
-        <label for="add-funcionario">Selecionar Funcionário</label>
-        <select id="add-funcionario" onchange="selecionarFuncionarioAdd()">
-          <option value="">— Escolha um funcionário —</option>
-        </select>
+        <label for="add-search">Pesquisar Funcionário</label>
+        <input id="add-search" type="text" placeholder="Digite nome ou matrícula" oninput="filtrarFuncionariosAdd()" />
+        <div class="autocomplete-list" id="add-autocomplete"></div>
       </div>
 
       <div class="field">
         <label for="add-inicio">Início das Férias</label>
-        <input id="add-inicio" type="date"/>
+        <input id="add-inicio" type="date" onchange="atualizarFimAdd()" />
       </div>
 
       <div class="field">
-        <label for="add-fim">Fim das Férias</label>
-        <input id="add-fim" type="date"/>
+        <label for="add-dias">Dias de Férias</label>
+        <input id="add-dias" type="number" min="1" value="1" oninput="atualizarFimAdd()" />
+        <div class="field-hint">Informe quantos dias o funcionário ficará de férias.</div>
       </div>
 
-      <button class="btn-primary green" id="btn-add-submit" onclick="handleAdicionarFerias()">
+      <div class="field">
+        <label for="add-fim">Retorna em</label>
+        <input id="add-fim" type="text" placeholder="—" disabled />
+      </div>
+
+      <button class="btn-primary green" id="btn-add-submit" onclick="handleAdicionarFerias()" type="button">
         <span class="spinner" id="add-spinner"></span>
         <span id="add-label">Adicionar Férias</span>
       </button>
@@ -651,7 +789,7 @@
   <div class="modal">
     <div class="modal-header">
       <h2>Editar Férias</h2>
-      <button class="btn-close" onclick="fecharModal('overlay-edit')">
+      <button class="btn-close" onclick="fecharModal('overlay-edit')" type="button">
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
@@ -674,7 +812,7 @@
         <input id="edit-fim" type="date"/>
       </div>
 
-      <button class="btn-primary green" id="btn-edit-submit" onclick="handleEditarFerias()">
+      <button class="btn-primary green" id="btn-edit-submit" onclick="handleEditarFerias()" type="button">
         <span class="spinner" id="edit-spinner"></span>
         <span id="edit-label">Salvar Alterações</span>
       </button>
@@ -686,7 +824,7 @@
 <!-- ── Toast ── -->
 <div class="toast" id="toast"></div>
 
-<script type="module">
+<script>
   // ─────────────────────────────────────────
   // ⚙️  CONFIGURAÇÃO
   // ─────────────────────────────────────────
@@ -716,6 +854,7 @@
   let funcionarioSelecionadoId = null;
   let feriasSelecionadaId = null;
   let mesAtual = new Date();
+  let setoresList = [];
 
   // ─────────────────────────────────────────
   // Utilitários
@@ -793,6 +932,24 @@
     return dias >= 0 && dias <= 30;
   }
 
+  function calcularFimData(inicioIso, dias) {
+    if (!inicioIso) return '';
+    const d = new Date(inicioIso + 'T00:00:00');
+    const add = Math.max(1, Number(dias || 1)) - 1;
+    d.setDate(d.getDate() + add);
+    const ano = d.getFullYear();
+    const mes = String(d.getMonth() + 1).padStart(2, '0');
+    const dia = String(d.getDate()).padStart(2, '0');
+    return `${ano}-${mes}-${dia}`;
+  }
+
+  function getStatusFeria(dataInicio, dataFim) {
+    if (!dataInicio || !dataFim) return 'finalizado';
+    if (estahEmFerias(dataInicio, dataFim)) return 'em-ferias';
+    if (dataInicio > dataAtual()) return 'pendente';
+    return 'finalizado';
+  }
+
   // ─────────────────────────────────────────
   // Carregar dados
   // ─────────────────────────────────────────
@@ -805,10 +962,12 @@
       if (!resFuncionarios.ok) throw new Error();
       funcionarios = await resFuncionarios.json();
 
+      // Extrair setores únicos
+      setoresList = [...new Set(funcionarios.map(f => f.setor).filter(s => s))];
+      preencherSelectSetores();
+
       renderCards();
       renderTabela();
-    
-      preencherSelectFuncionarios();
 
       const totalEmFerias = funcionarios.filter(f => f.inicio_ferias && f.fim_ferias && estahEmFerias(f.inicio_ferias, f.fim_ferias)).length;
       document.getElementById('count-label').textContent =
@@ -821,10 +980,39 @@
   }
 
   // ─────────────────────────────────────────
+  // Preencher Select de Setores
+  // ─────────────────────────────────────────
+  function preencherSelectSetores() {
+    const select = document.getElementById('filter-setor');
+    select.innerHTML = '<option value="">Todos os setores</option>';
+    setoresList.sort().forEach(setor => {
+      const option = document.createElement('option');
+      option.value = setor;
+      option.textContent = setor;
+      select.appendChild(option);
+    });
+  }
+
+  // ─────────────────────────────────────────
+  // Aplicar Filtros
+  // ─────────────────────────────────────────
+  function aplicarFiltros() {
+    const filterSetor = document.getElementById('filter-setor').value;
+    const filterStatus = document.getElementById('filter-status').value;
+
+    renderTabela(filterSetor, filterStatus);
+  }
+
+  function limparFiltros() {
+    document.getElementById('filter-setor').value = '';
+    document.getElementById('filter-status').value = '';
+    renderTabela();
+  }
+
+  // ─────────────────────────────────────────
   // Render Cards
   // ─────────────────────────────────────────
   function renderCards() {
-    // Em Férias
     const emFerias = funcionarios.filter(f => f.inicio_ferias && f.fim_ferias && estahEmFerias(f.inicio_ferias, f.fim_ferias));
     const listEmFerias = document.getElementById('list-em-ferias');
     document.getElementById('count-em-ferias').textContent = emFerias.length;
@@ -842,7 +1030,6 @@
       }).join('');
     }
 
-    // Próximas Férias
     const proximasFerias = funcionarios.filter(f => 
       f.inicio_ferias && 
       !estahEmFerias(f.inicio_ferias, f.fim_ferias) && 
@@ -870,21 +1057,28 @@
   // ─────────────────────────────────────────
   // Render Tabela
   // ─────────────────────────────────────────
-  function renderTabela() {
+  function renderTabela(filterSetor = '', filterStatus = '') {
     const tbody = document.getElementById('tabela-body');
-    const comFerias = funcionarios.filter(f => f.inicio_ferias && f.fim_ferias);
+    let comFerias = funcionarios.filter(f => f.inicio_ferias && f.fim_ferias);
+
+    // Aplicar filtros
+    if (filterSetor) {
+      comFerias = comFerias.filter(f => f.setor === filterSetor);
+    }
+
+    if (filterStatus) {
+      comFerias = comFerias.filter(f => getStatusFeria(f.inicio_ferias, f.fim_ferias) === filterStatus);
+    }
 
     if (!comFerias.length) {
       tbody.innerHTML = `<tr><td colspan="7"><div class="empty">
         <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        <p>Nenhuma férias registrada.</p></div></td></tr>`;
+        <p>Nenhuma férias encontrada.</p></div></td></tr>`;
       return;
     }
 
     tbody.innerHTML = comFerias.map(f => {
-      let status = 'finalizado';
-      if (estahEmFerias(f.inicio_ferias, f.fim_ferias)) status = 'em-ferias';
-      else if (f.inicio_ferias > dataAtual()) status = 'pendente';
+      const status = getStatusFeria(f.inicio_ferias, f.fim_ferias);
 
       return `
         <tr>
@@ -908,52 +1102,79 @@
     }).join('');
   }
 
-  
+  // ─────────────────────────────────────────
+  // Filtrar Funcionários na busca
+  // ─────────────────────────────────────────
+  function filtrarFuncionariosAdd() {
+    const q = (document.getElementById('add-search').value || '').toLowerCase().trim();
+    const autocompleteList = document.getElementById('add-autocomplete');
 
-  // ─────────────────────────────────────────
-  // Preencher Select Funcionários
-  // ─────────────────────────────────────────
-  function preencherSelectFuncionarios() {
-    const select = document.getElementById('add-funcionario');
-    select.innerHTML = '<option value="">— Escolha um funcionário —</option>';
-    funcionarios.forEach(f => {
-      const option = document.createElement('option');
-      option.value = f.id;
-      option.textContent = f.nome;
-      select.appendChild(option);
+    if (!q) {
+      funcionarioSelecionadoId = null;
+      document.getElementById('add-func-info').style.display = 'none';
+      autocompleteList.classList.remove('show');
+      return;
+    }
+
+    const filtrados = funcionarios.filter(f => {
+      return (f.nome || '').toLowerCase().includes(q) || (f.matricula || '').toLowerCase().includes(q);
     });
+
+    if (filtrados.length === 0) {
+      autocompleteList.innerHTML = '<div class="autocomplete-item">Nenhum funcionário encontrado</div>';
+      autocompleteList.classList.add('show');
+      funcionarioSelecionadoId = null;
+      document.getElementById('add-func-info').style.display = 'none';
+    } else {
+      autocompleteList.innerHTML = filtrados.map(f => `
+        <div class="autocomplete-item" onclick="selecionarFuncionarioDropdown('${f.id}', '${f.nome.replace(/'/g, "\\'")}', '${(f.matricula || '').replace(/'/g, "\\'")}', '${(f.setor || '').replace(/'/g, "\\'")}')" style="cursor: pointer;">
+          <div class="autocomplete-item-nome">${f.nome}</div>
+          <div class="autocomplete-item-sub">${f.matricula || '—'} · ${f.setor || '—'}</div>
+        </div>
+      `).join('');
+      autocompleteList.classList.add('show');
+    }
+  }
+
+  function selecionarFuncionarioDropdown(id, nome, matricula, setor) {
+    funcionarioSelecionadoId = id;
+    document.getElementById('add-search').value = nome;
+    document.getElementById('add-autocomplete').classList.remove('show');
+    
+    document.getElementById('add-avatar').textContent = inicialNome(nome);
+    document.getElementById('add-nome').textContent = nome;
+    document.getElementById('add-sub').textContent = `${matricula || '—'} · ${setor || '—'}`;
+    document.getElementById('add-func-info').style.display = 'flex';
+  }
+
+  function atualizarFimAdd() {
+    const inicio = document.getElementById('add-inicio').value;
+    const dias = document.getElementById('add-dias').value;
+    const fim = calcularFimData(inicio, dias);
+    document.getElementById('add-fim').value = fim ? formatarData(fim) : '—';
   }
 
   // ─────────────────────────────────────────
   // Abrir Modal Adicionar
   // ─────────────────────────────────────────
-  window.abrirAdicionarFerias = function() {
+  function abrirAdicionarFerias() {
     funcionarioSelecionadoId = null;
-    document.getElementById('add-funcionario').value = '';
+    document.getElementById('add-search').value = '';
     document.getElementById('add-inicio').value = '';
+    document.getElementById('add-dias').value = '1';
     document.getElementById('add-fim').value = '';
     document.getElementById('add-func-info').style.display = 'none';
+    document.getElementById('add-autocomplete').classList.remove('show');
     hideMsg('add-msg');
     document.getElementById('overlay-add').classList.add('open');
-  };
-
-  window.selecionarFuncionarioAdd = function() {
-    funcionarioSelecionadoId = document.getElementById('add-funcionario').value;
-    if (funcionarioSelecionadoId) {
-      const f = funcionarios.find(x => x.id === funcionarioSelecionadoId);
-      document.getElementById('add-avatar').textContent = inicialNome(f.nome);
-      document.getElementById('add-nome').textContent = f.nome;
-      document.getElementById('add-sub').textContent = `${f.matricula || '—'} · ${f.setor || '—'}`;
-      document.getElementById('add-func-info').style.display = 'flex';
-    }
-  };
+  }
 
   // ─────────────────────────────────────────
   // Handle Adicionar Férias
   // ─────────────────────────────────────────
-  window.handleAdicionarFerias = async function() {
+  async function handleAdicionarFerias() {
     const inicio = document.getElementById('add-inicio').value;
-    const fim = document.getElementById('add-fim').value;
+    const dias = Number(document.getElementById('add-dias').value);
     hideMsg('add-msg');
 
     if (!funcionarioSelecionadoId) {
@@ -964,12 +1185,14 @@
       showMsg('add-msg', 'error', 'Informe a data de início.');
       return;
     }
-    if (!fim) {
-      showMsg('add-msg', 'error', 'Informe a data de fim.');
+    if (!dias || isNaN(dias) || dias < 1) {
+      showMsg('add-msg', 'error', 'Informe um número de dias válido (>= 1).');
       return;
     }
-    if (fim < inicio) {
-      showMsg('add-msg', 'error', 'A data de fim não pode ser anterior à de início.');
+
+    const fim = calcularFimData(inicio, dias);
+    if (!fim) {
+      showMsg('add-msg', 'error', 'Não foi possível calcular a data de fim.');
       return;
     }
 
@@ -988,7 +1211,10 @@
         }
       );
 
-      if (!res.ok) throw new Error('Erro ao adicionar férias.');
+      if (!res.ok) {
+        const txt = await res.text().catch(() => '');
+        throw new Error(txt || 'Erro ao adicionar férias.');
+      }
 
       fecharModal('overlay-add');
       toast('Férias adicionadas com sucesso!');
@@ -999,14 +1225,14 @@
     } finally {
       setLoading('btn-add-submit', 'add-spinner', 'add-label', false);
     }
-  };
+  }
 
   // ─────────────────────────────────────────
   // Abrir Modal Editar
   // ─────────────────────────────────────────
-  window.abrirEditarFerias = function(id) {
+  function abrirEditarFerias(id) {
     feriasSelecionadaId = id;
-    const f = funcionarios.find(x => x.id === id);
+    const f = funcionarios.find(x => String(x.id) === String(id));
     if (!f) return;
 
     document.getElementById('edit-avatar').textContent = inicialNome(f.nome);
@@ -1017,12 +1243,12 @@
     hideMsg('edit-msg');
 
     document.getElementById('overlay-edit').classList.add('open');
-  };
+  }
 
   // ─────────────────────────────────────────
   // Handle Editar Férias
   // ─────────────────────────────────────────
-  window.handleEditarFerias = async function() {
+  async function handleEditarFerias() {
     const inicio = document.getElementById('edit-inicio').value;
     const fim = document.getElementById('edit-fim').value;
     hideMsg('edit-msg');
@@ -1066,12 +1292,12 @@
     } finally {
       setLoading('btn-edit-submit', 'edit-spinner', 'edit-label', false);
     }
-  };
+  }
 
   // ─────────────────────────────────────────
   // Deletar Férias
   // ─────────────────────────────────────────
-  window.deletarFerias = async function(id) {
+  async function deletarFerias(id) {
     if (!confirm('Tem certeza que deseja remover as férias?')) return;
 
     try {
@@ -1095,23 +1321,31 @@
     } catch (err) {
       toast('Erro ao remover férias.');
     }
-  };
-
-
+  }
 
   // ─────────────────────────────────────────
   // Sair
   // ─────────────────────────────────────────
-  window.sair = function() {
+  function sair() {
     localStorage.removeItem('sacc_usuario');
     window.location.href = 'login.html';
-  };
+  }
 
-  // Esc fecha modais
+  // Esc fecha modals
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
       fecharModal('overlay-add');
       fecharModal('overlay-edit');
+      document.getElementById('add-autocomplete').classList.remove('show');
+    }
+  });
+
+  // Clica fora fecha autocomplete
+  document.addEventListener('click', e => {
+    const searchInput = document.getElementById('add-search');
+    const autocompleteList = document.getElementById('add-autocomplete');
+    if (e.target !== searchInput && !autocompleteList.contains(e.target)) {
+      autocompleteList.classList.remove('show');
     }
   });
 
