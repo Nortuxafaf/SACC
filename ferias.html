@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SACC — Férias</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:        #1e3a5f;
+      --navy-light:  #2a4a72;
+      --white:       #ffffff;
+      --gray:        #6b7280;
+      --gray-light:  #f3f5f8;
+      --border:      #d1dae6;
+      --danger:      #dc2626;
+      --danger-bg:   #fef2f2;
+      --danger-border:#fecaca;
+      --success:     #16a34a;
+      --success-bg:  #f0fdf4;
+      --success-border:#bbf7d0;
+      --warning:     #d97706;
+      --warning-bg:  #fffbeb;
+      --warning-border:#fde68a;
+      --info:        #0ea5e9;
+      --info-bg:     #f0f9ff;
+      --info-border: #bae6fd;
+      --row-hover:   #f0f4fa;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--gray-light);
+      color: var(--navy);
+      min-height: 100vh;
+    }
+
+    /* ── Topbar ── */
+    .topbar {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--navy);
+      letter-spacing: -0.5px;
+    }
+
+    .topbar-sep {
+      width: 1px;
+      height: 20px;
+      background: var(--border);
+    }
+
+    .topbar-title {
+      font-size: 13px;
+      color: var(--gray);
+      font-weight: 400;
+    }
+
+    .topbar-nav {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      margin-left: 8px;
+    }
+
+    .nav-link {
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--gray);
+      text-decoration: none;
+      padding: 6px 13px;
+      border-radius: 6px;
+      transition: background .15s, color .15s;
+      white-space: nowrap;
+    }
+    .nav-link:hover { background: var(--gray-light); color: var(--navy); }
+    .nav-link.active {
+      background: #e8eef7;
+      color: var(--navy);
+      font-weight: 600;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .topbar-user {
+      font-size: 12px;
+      color: var(--gray);
+    }
+    .topbar-user strong { color: var(--navy); font-weight: 600; }
+
+    .btn-sair-top {
+      font-size: 12px;
+      color: var(--gray);
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 5px 12px;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: all .15s;
+    }
+    .btn-sair-top:hover { border-color: var(--navy); color: var(--navy); }
+
+    /* ── Content ── */
+    .content {
+      max-width: 960px;
+      margin: 36px auto;
+      padding: 0 24px;
+    }
+
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 28px;
+    }
+
+    .page-header h1 { font-size: 18px; font-weight: 600; color: var(--navy); }
+    .page-header p  { font-size: 12px; color: var(--gray); margin-top: 2px; }
+
+    .btn-add-ferias {
+      font-size: 13px;
+      color: #fff;
+      background: var(--success);
+      border: none;
+      border-radius: 6px;
+      padding: 8px 14px;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      transition: background .15s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-add-ferias:hover { background: #15803d; }
+
+    /* ── Cards Container ── */
+    .cards-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .card-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .card-icon.em-ferias { background: var(--success-bg); color: var(--success); }
+    .card-icon.vencimento { background: var(--warning-bg); color: var(--warning); }
+
+    .card-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--navy);
+    }
+
+    .card-count {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--navy);
+      margin: 8px 0 4px 0;
+    }
+
+    .card-desc {
+      font-size: 11px;
+      color: var(--gray);
+    }
+
+    .card-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 12px;
+      max-height: 120px;
+      overflow-y: auto;
+    }
+
+    .card-list-item {
+      padding: 6px;
+      background: var(--gray-light);
+      border-radius: 4px;
+      font-size: 11px;
+      color: var(--navy);
+    }
+
+    .card-list-item .item-nome {
+      font-weight: 600;
+    }
+
+    .card-list-item .item-data {
+      font-size: 10px;
+      color: var(--gray);
+      margin-top: 1px;
+    }
+
+    .card-empty {
+      text-align: center;
+      padding: 8px;
+      color: var(--gray);
+      font-size: 11px;
+    }
+
+    
+    /* ── Tabela Férias ── */
+    .table-wrap {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    table { width: 100%; border-collapse: collapse; }
+
+    thead tr {
+      background: var(--gray-light);
+      border-bottom: 1px solid var(--border);
+    }
+
+    thead th {
+      text-align: left;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--gray);
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      padding: 11px 16px;
+    }
+    thead th.th-action { text-align: right; }
+
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background .12s;
+    }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--row-hover); }
+
+    tbody td {
+      padding: 13px 16px;
+      font-size: 13px;
+      color: var(--navy);
+    }
+
+    .td-matricula {
+      font-weight: 500;
+      color: var(--gray);
+      font-size: 12px;
+      font-family: 'Inter', monospace;
+    }
+
+    .td-setor {
+      display: inline-block;
+      font-size: 11px;
+      padding: 3px 9px;
+      border-radius: 20px;
+      background: #e8eef7;
+      color: var(--navy);
+      font-weight: 500;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 20px;
+    }
+    .status-badge.em-ferias { background: var(--success-bg); color: var(--success); }
+    .status-badge.pendente  { background: var(--warning-bg); color: var(--warning); }
+    .status-badge.finalizado { background: var(--gray-light); color: var(--gray); }
+
+    .td-action {
+      text-align: right;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 4px;
+    }
+
+    .btn-icon {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #b0bac8;
+      padding: 5px 9px;
+      border-radius: 5px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      transition: color .15s, background .15s;
+    }
+    .btn-icon.editar:hover { color: var(--info); background: var(--info-bg); }
+    .btn-icon.deletar:hover { color: var(--danger); background: var(--danger-bg); }
+
+    /* ── Empty / Loading ── */
+    .empty {
+      text-align: center;
+      padding: 52px 24px;
+      color: var(--gray);
+    }
+    .empty svg { margin-bottom: 12px; opacity: .35; }
+    .empty p { font-size: 13px; }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: var(--gray);
+      font-size: 13px;
+    }
+
+    /* ── Feedback msg ── */
+    .msg {
+      font-size: 12px;
+      margin-top: 10px;
+      padding: 9px 12px;
+      border-radius: 6px;
+      text-align: left;
+      display: none;
+    }
+    .msg.error   { background: var(--danger-bg);  color: var(--danger);  border: 1px solid var(--danger-border);  display: block; }
+    .msg.success { background: var(--success-bg); color: var(--success); border: 1px solid var(--success-border); display: block; }
+    .msg.warning { background: var(--warning-bg); color: var(--warning); border: 1px solid var(--warning-border); display: block; }
+
+    /* ── Spinner ── */
+    .spinner {
+      width: 14px; height: 14px;
+      border: 2px solid rgba(255,255,255,.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .6s linear infinite;
+      display: none;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Modal shared ── */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.32);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity .2s;
+      z-index: 100;
+    }
+    .overlay.open { opacity: 1; pointer-events: all; }
+
+    .modal {
+      background: var(--white);
+      border-radius: 16px;
+      box-shadow: 0 12px 40px rgba(0,0,0,.15);
+      transform: translateY(12px);
+      transition: transform .2s;
+      width: 400px;
+      max-height: 88vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .overlay.open .modal { transform: translateY(0); }
+
+    .modal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 22px 24px 18px 24px;
+      flex-shrink: 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .modal-header h2 { font-size: 15px; font-weight: 600; color: var(--navy); }
+
+    .modal-body {
+      padding: 22px 24px 24px 24px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .btn-close {
+      background: none; border: none; cursor: pointer;
+      color: var(--gray); padding: 2px;
+      display: flex; align-items: center;
+      transition: color .15s;
+    }
+    .btn-close:hover { color: var(--navy); }
+
+    /* ── Modal funcionário info ── */
+    .modal-func-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      background: var(--gray-light);
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    .modal-func-avatar {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      background: #e8eef7;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; font-weight: 700; color: var(--navy);
+      flex-shrink: 0;
+    }
+
+    .modal-func-nome { font-size: 13px; font-weight: 600; color: var(--navy); }
+    .modal-func-sub  { font-size: 11px; color: var(--gray); margin-top: 1px; }
+
+    /* ── Form fields ── */
+    .field { margin-bottom: 14px; text-align: left; }
+    .field label {
+      display: block; font-size: 12px; font-weight: 500;
+      color: var(--navy); margin-bottom: 6px;
+    }
+    .field input, .field textarea, .field select {
+      width: 100%;
+      padding: 10px 13px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      color: var(--navy);
+      background: var(--white);
+      outline: none;
+      transition: border-color .15s;
+    }
+    .field input::placeholder,
+    .field textarea::placeholder { color: #b0bac8; }
+    .field input:focus,
+    .field textarea:focus,
+    .field select:focus { border-color: var(--navy); }
+
+    .field-hint {
+      font-size: 11px;
+      color: var(--gray);
+      margin-top: 4px;
+    }
+
+    /* ── Botões modais ── */
+    .btn-primary {
+      width: 100%; margin-top: 6px; padding: 11px;
+      border: none; border-radius: 6px;
+      font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: background .15s;
+      color: #fff;
+    }
+    .btn-primary.green { background: var(--success); }
+    .btn-primary.green:hover { background: #15803d; }
+    .btn-primary.red   { background: var(--danger); }
+    .btn-primary.red:hover   { background: #b91c1c; }
+    .btn-primary:disabled { opacity: .6; cursor: not-allowed; }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed; bottom: 24px; right: 24px;
+      background: var(--navy); color: #fff;
+      font-size: 13px; padding: 11px 18px;
+      border-radius: 7px;
+      box-shadow: 0 4px 16px rgba(0,0,0,.15);
+      opacity: 0; transform: translateY(8px);
+      transition: opacity .2s, transform .2s;
+      pointer-events: none;
+      z-index: 999;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+  </style>
+</head>
+<body>
+
+<!-- ── Topbar ── -->
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="logo">SACC</span>
+    <div class="topbar-sep"></div>
+    <span class="topbar-title">Sistema Administrativo</span>
+    <div class="topbar-sep"></div>
+    <nav class="topbar-nav">
+      <a href="dashboard.html" class="nav-link">Funcionários</a>
+      <a href="bancohoras.html" class="nav-link">Banco de Horas</a>
+      <a href="ferias.html" class="nav-link active">Férias</a>
+    </nav>
+  </div>
+  <div class="topbar-right">
+    <span class="topbar-user">Olá, <strong id="topbar-nome">—</strong></span>
+    <button class="btn-sair-top" onclick="sair()">Sair</button>
+  </div>
+</div>
+
+<!-- ── Content ── -->
+<div class="content">
+  <div class="page-header">
+    <div>
+      <h1>Férias</h1>
+      <p id="count-label">Carregando...</p>
+    </div>
+    <button class="btn-add-ferias" onclick="abrirAdicionarFerias()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Adicionar Férias
+    </button>
+  </div>
+
+  <!-- ── Cards ── -->
+  <div class="cards-container">
+    <!-- Em Férias -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon em-ferias">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        </div>
+        <h3 class="card-title">Em Férias</h3>
+      </div>
+      <div class="card-count" id="count-em-ferias">0</div>
+      <p class="card-desc">Atualmente em férias</p>
+      <ul class="card-list" id="list-em-ferias">
+        <li class="card-empty">Nenhum funcionário em férias</li>
+      </ul>
+    </div>
+
+    <!-- Próximas Férias -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon vencimento">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <h3 class="card-title">Próximas Férias</h3>
+      </div>
+      <div class="card-count" id="count-proximas">0</div>
+      <p class="card-desc">Próximos 30 dias</p>
+      <ul class="card-list" id="list-proximas">
+        <li class="card-empty">Nenhuma férias próxima</li>
+      </ul>
+    </div>
+  </div>
+
+  
+
+  <!-- ── Tabela Férias ── -->
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Matrícula</th>
+          <th>Nome</th>
+          <th>Setor</th>
+          <th>Início</th>
+          <th>Fim</th>
+          <th>Status</th>
+          <th class="th-action">Ações</th>
+        </tr>
+      </thead>
+      <tbody id="tabela-body">
+        <tr><td colspan="7"><div class="loading">Carregando férias...</div></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ── Modal: Adicionar Férias ── -->
+<div class="overlay" id="overlay-add" onclick="fecharFora(event,'overlay-add')">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Adicionar Férias</h2>
+      <button class="btn-close" onclick="fecharModal('overlay-add')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-func-info" id="add-func-info" style="display: none;">
+        <div class="modal-func-avatar" id="add-avatar">—</div>
+        <div>
+          <div class="modal-func-nome" id="add-nome">—</div>
+          <div class="modal-func-sub" id="add-sub">—</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="add-funcionario">Selecionar Funcionário</label>
+        <select id="add-funcionario" onchange="selecionarFuncionarioAdd()">
+          <option value="">— Escolha um funcionário —</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="add-inicio">Início das Férias</label>
+        <input id="add-inicio" type="date"/>
+      </div>
+
+      <div class="field">
+        <label for="add-fim">Fim das Férias</label>
+        <input id="add-fim" type="date"/>
+      </div>
+
+      <button class="btn-primary green" id="btn-add-submit" onclick="handleAdicionarFerias()">
+        <span class="spinner" id="add-spinner"></span>
+        <span id="add-label">Adicionar Férias</span>
+      </button>
+      <div class="msg" id="add-msg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Modal: Editar Férias ── -->
+<div class="overlay" id="overlay-edit" onclick="fecharFora(event,'overlay-edit')">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Editar Férias</h2>
+      <button class="btn-close" onclick="fecharModal('overlay-edit')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-func-info">
+        <div class="modal-func-avatar" id="edit-avatar">—</div>
+        <div>
+          <div class="modal-func-nome" id="edit-nome">—</div>
+          <div class="modal-func-sub" id="edit-sub">—</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="edit-inicio">Início das Férias</label>
+        <input id="edit-inicio" type="date"/>
+      </div>
+
+      <div class="field">
+        <label for="edit-fim">Fim das Férias</label>
+        <input id="edit-fim" type="date"/>
+      </div>
+
+      <button class="btn-primary green" id="btn-edit-submit" onclick="handleEditarFerias()">
+        <span class="spinner" id="edit-spinner"></span>
+        <span id="edit-label">Salvar Alterações</span>
+      </button>
+      <div class="msg" id="edit-msg"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Toast ── -->
+<div class="toast" id="toast"></div>
+
+<script type="module">
+  // ─────────────────────────────────────────
+  // ⚙️  CONFIGURAÇÃO
+  // ─────────────────────────────────────────
+  const SUPABASE_URL      = 'https://uxtakyijomozrraazuxi.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV4dGFreWlqb21venJyYWF6dXhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5MzgyNDIsImV4cCI6MjA5MDUxNDI0Mn0.uKeMN7NdNaLk9cyeli9BBZLjTLkPFbPqKic1mFfIJss';
+
+  const headers = {
+    'Content-Type': 'application/json',
+    'apikey': SUPABASE_ANON_KEY,
+    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+  };
+
+  // ─────────────────────────────────────────
+  // Proteção de rota
+  // ─────────────────────────────────────────
+  const usuarioLogado = JSON.parse(localStorage.getItem('sacc_usuario') || 'null');
+  if (!usuarioLogado) {
+    window.location.href = 'login.html';
+  } else {
+    document.getElementById('topbar-nome').textContent = usuarioLogado.login;
+  }
+
+  // ─────────────────────────────────────────
+  // Estado
+  // ─────────────────────────────────────────
+  let funcionarios = [];
+  let funcionarioSelecionadoId = null;
+  let feriasSelecionadaId = null;
+  let mesAtual = new Date();
+
+  // ─────────────────────────────────────────
+  // Utilitários
+  // ─────────────────────────────────────────
+  function showMsg(id, type, text) {
+    const el = document.getElementById(id);
+    el.className = `msg ${type}`;
+    el.textContent = text;
+  }
+
+  function hideMsg(id) {
+    const el = document.getElementById(id);
+    el.className = 'msg';
+    el.textContent = '';
+  }
+
+  function setLoading(btnId, spinnerId, labelId, loading) {
+    document.getElementById(btnId).disabled = loading;
+    document.getElementById(spinnerId).style.display = loading ? 'inline-block' : 'none';
+    document.getElementById(labelId).style.opacity = loading ? '0' : '1';
+  }
+
+  function toast(msg) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 2800);
+  }
+
+  function fecharModal(id) {
+    document.getElementById(id).classList.remove('open');
+  }
+
+  function fecharFora(e, id) {
+    if (e.target.id === id) fecharModal(id);
+  }
+
+  function inicialNome(nome) {
+    if (!nome) return '?';
+    const partes = nome.trim().split(' ');
+    return partes.length >= 2
+      ? (partes[0][0] + partes[partes.length - 1][0]).toUpperCase()
+      : partes[0][0].toUpperCase();
+  }
+
+  function formatarData(iso) {
+    if (!iso) return '—';
+    const [ano, mes, dia] = iso.split('-');
+    return `${dia}/${mes}/${ano}`;
+  }
+
+  function dataAtual() {
+    const hoje = new Date();
+    const ano = hoje.getFullYear();
+    const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+    const dia = String(hoje.getDate()).padStart(2, '0');
+    return `${ano}-${mes}-${dia}`;
+  }
+
+  function diasDiferenca(dataFim) {
+    const fim = new Date(dataFim + 'T23:59:59');
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+    const ms = fim - hoje;
+    return Math.ceil(ms / (1000 * 60 * 60 * 24));
+  }
+
+  function estahEmFerias(dataInicio, dataFim) {
+    const hoje = dataAtual();
+    return hoje >= dataInicio && hoje <= dataFim;
+  }
+
+  function vencimentoProximo(dataInicio) {
+    const dias = diasDiferenca(dataInicio);
+    return dias >= 0 && dias <= 30;
+  }
+
+  // ─────────────────────────────────────────
+  // Carregar dados
+  // ─────────────────────────────────────────
+  async function carregarDados() {
+    try {
+      const resFuncionarios = await fetch(
+        `${SUPABASE_URL}/rest/v1/funcionarios?select=id,nome,matricula,setor,inicio_ferias,fim_ferias&order=nome.asc`,
+        { headers }
+      );
+      if (!resFuncionarios.ok) throw new Error();
+      funcionarios = await resFuncionarios.json();
+
+      renderCards();
+      renderTabela();
+    
+      preencherSelectFuncionarios();
+
+      const totalEmFerias = funcionarios.filter(f => f.inicio_ferias && f.fim_ferias && estahEmFerias(f.inicio_ferias, f.fim_ferias)).length;
+      document.getElementById('count-label').textContent =
+        `${funcionarios.length} funcionários — ${totalEmFerias} em férias agora`;
+
+    } catch {
+      document.getElementById('tabela-body').innerHTML =
+        `<tr><td colspan="7"><div class="empty"><p>Erro ao carregar. Tente novamente.</p></div></td></tr>`;
+    }
+  }
+
+  // ─────────────────────────────────────────
+  // Render Cards
+  // ─────────────────────────────────────────
+  function renderCards() {
+    // Em Férias
+    const emFerias = funcionarios.filter(f => f.inicio_ferias && f.fim_ferias && estahEmFerias(f.inicio_ferias, f.fim_ferias));
+    const listEmFerias = document.getElementById('list-em-ferias');
+    document.getElementById('count-em-ferias').textContent = emFerias.length;
+
+    if (!emFerias.length) {
+      listEmFerias.innerHTML = `<li class="card-empty">Nenhum funcionário em férias</li>`;
+    } else {
+      listEmFerias.innerHTML = emFerias.map(f => {
+        return `
+          <li class="card-list-item">
+            <span class="item-nome">${f.nome || '—'}</span>
+            <span class="item-data">Retorna ${formatarData(f.fim_ferias)}</span>
+          </li>
+        `;
+      }).join('');
+    }
+
+    // Próximas Férias
+    const proximasFerias = funcionarios.filter(f => 
+      f.inicio_ferias && 
+      !estahEmFerias(f.inicio_ferias, f.fim_ferias) && 
+      f.inicio_ferias >= dataAtual() && 
+      vencimentoProximo(f.inicio_ferias)
+    );
+    const listProximas = document.getElementById('list-proximas');
+    document.getElementById('count-proximas').textContent = proximasFerias.length;
+
+    if (!proximasFerias.length) {
+      listProximas.innerHTML = `<li class="card-empty">Nenhuma férias próxima</li>`;
+    } else {
+      listProximas.innerHTML = proximasFerias.map(f => {
+        const dias = diasDiferenca(f.inicio_ferias);
+        return `
+          <li class="card-list-item">
+            <span class="item-nome">${f.nome || '—'}</span>
+            <span class="item-data">Em ${dias} dia${dias !== 1 ? 's' : ''}</span>
+          </li>
+        `;
+      }).join('');
+    }
+  }
+
+  // ─────────────────────────────────────────
+  // Render Tabela
+  // ─────────────────────────────────────────
+  function renderTabela() {
+    const tbody = document.getElementById('tabela-body');
+    const comFerias = funcionarios.filter(f => f.inicio_ferias && f.fim_ferias);
+
+    if (!comFerias.length) {
+      tbody.innerHTML = `<tr><td colspan="7"><div class="empty">
+        <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <p>Nenhuma férias registrada.</p></div></td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = comFerias.map(f => {
+      let status = 'finalizado';
+      if (estahEmFerias(f.inicio_ferias, f.fim_ferias)) status = 'em-ferias';
+      else if (f.inicio_ferias > dataAtual()) status = 'pendente';
+
+      return `
+        <tr>
+          <td class="td-matricula">${f.matricula || '—'}</td>
+          <td>${f.nome || '—'}</td>
+          <td><span class="td-setor">${f.setor || '—'}</span></td>
+          <td>${formatarData(f.inicio_ferias)}</td>
+          <td>${formatarData(f.fim_ferias)}</td>
+          <td><span class="status-badge ${status}">${status === 'em-ferias' ? '✓ Em férias' : status === 'pendente' ? '⏱ Pendente' : '✓ Finalizado'}</span></td>
+          <td>
+            <div class="td-action">
+              <button class="btn-icon editar" onclick="abrirEditarFerias('${f.id}')" title="Editar">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              </button>
+              <button class="btn-icon deletar" onclick="deletarFerias('${f.id}')" title="Deletar">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+              </button>
+            </div>
+          </td>
+        </tr>`;
+    }).join('');
+  }
+
+  
+
+  // ─────────────────────────────────────────
+  // Preencher Select Funcionários
+  // ─────────────────────────────────────────
+  function preencherSelectFuncionarios() {
+    const select = document.getElementById('add-funcionario');
+    select.innerHTML = '<option value="">— Escolha um funcionário —</option>';
+    funcionarios.forEach(f => {
+      const option = document.createElement('option');
+      option.value = f.id;
+      option.textContent = f.nome;
+      select.appendChild(option);
+    });
+  }
+
+  // ─────────────────────────────────────────
+  // Abrir Modal Adicionar
+  // ─────────────────────────────────────────
+  window.abrirAdicionarFerias = function() {
+    funcionarioSelecionadoId = null;
+    document.getElementById('add-funcionario').value = '';
+    document.getElementById('add-inicio').value = '';
+    document.getElementById('add-fim').value = '';
+    document.getElementById('add-func-info').style.display = 'none';
+    hideMsg('add-msg');
+    document.getElementById('overlay-add').classList.add('open');
+  };
+
+  window.selecionarFuncionarioAdd = function() {
+    funcionarioSelecionadoId = document.getElementById('add-funcionario').value;
+    if (funcionarioSelecionadoId) {
+      const f = funcionarios.find(x => x.id === funcionarioSelecionadoId);
+      document.getElementById('add-avatar').textContent = inicialNome(f.nome);
+      document.getElementById('add-nome').textContent = f.nome;
+      document.getElementById('add-sub').textContent = `${f.matricula || '—'} · ${f.setor || '—'}`;
+      document.getElementById('add-func-info').style.display = 'flex';
+    }
+  };
+
+  // ─────────────────────────────────────────
+  // Handle Adicionar Férias
+  // ─────────────────────────────────────────
+  window.handleAdicionarFerias = async function() {
+    const inicio = document.getElementById('add-inicio').value;
+    const fim = document.getElementById('add-fim').value;
+    hideMsg('add-msg');
+
+    if (!funcionarioSelecionadoId) {
+      showMsg('add-msg', 'error', 'Selecione um funcionário.');
+      return;
+    }
+    if (!inicio) {
+      showMsg('add-msg', 'error', 'Informe a data de início.');
+      return;
+    }
+    if (!fim) {
+      showMsg('add-msg', 'error', 'Informe a data de fim.');
+      return;
+    }
+    if (fim < inicio) {
+      showMsg('add-msg', 'error', 'A data de fim não pode ser anterior à de início.');
+      return;
+    }
+
+    setLoading('btn-add-submit', 'add-spinner', 'add-label', true);
+
+    try {
+      const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/funcionarios?id=eq.${funcionarioSelecionadoId}`,
+        {
+          method: 'PATCH',
+          headers: { ...headers, 'Prefer': 'return=minimal' },
+          body: JSON.stringify({
+            inicio_ferias: inicio,
+            fim_ferias: fim,
+          }),
+        }
+      );
+
+      if (!res.ok) throw new Error('Erro ao adicionar férias.');
+
+      fecharModal('overlay-add');
+      toast('Férias adicionadas com sucesso!');
+      carregarDados();
+
+    } catch (err) {
+      showMsg('add-msg', 'error', err.message || 'Erro inesperado.');
+    } finally {
+      setLoading('btn-add-submit', 'add-spinner', 'add-label', false);
+    }
+  };
+
+  // ─────────────────────────────────────────
+  // Abrir Modal Editar
+  // ─────────────────────────────────────────
+  window.abrirEditarFerias = function(id) {
+    feriasSelecionadaId = id;
+    const f = funcionarios.find(x => x.id === id);
+    if (!f) return;
+
+    document.getElementById('edit-avatar').textContent = inicialNome(f.nome);
+    document.getElementById('edit-nome').textContent = f.nome;
+    document.getElementById('edit-sub').textContent = `${f.matricula || '—'} · ${f.setor || '—'}`;
+    document.getElementById('edit-inicio').value = f.inicio_ferias || '';
+    document.getElementById('edit-fim').value = f.fim_ferias || '';
+    hideMsg('edit-msg');
+
+    document.getElementById('overlay-edit').classList.add('open');
+  };
+
+  // ─────────────────────────────────────────
+  // Handle Editar Férias
+  // ─────────────────────────────────────────
+  window.handleEditarFerias = async function() {
+    const inicio = document.getElementById('edit-inicio').value;
+    const fim = document.getElementById('edit-fim').value;
+    hideMsg('edit-msg');
+
+    if (!inicio) {
+      showMsg('edit-msg', 'error', 'Informe a data de início.');
+      return;
+    }
+    if (!fim) {
+      showMsg('edit-msg', 'error', 'Informe a data de fim.');
+      return;
+    }
+    if (fim < inicio) {
+      showMsg('edit-msg', 'error', 'A data de fim não pode ser anterior à de início.');
+      return;
+    }
+
+    setLoading('btn-edit-submit', 'edit-spinner', 'edit-label', true);
+
+    try {
+      const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/funcionarios?id=eq.${feriasSelecionadaId}`,
+        {
+          method: 'PATCH',
+          headers: { ...headers, 'Prefer': 'return=minimal' },
+          body: JSON.stringify({
+            inicio_ferias: inicio,
+            fim_ferias: fim,
+          }),
+        }
+      );
+
+      if (!res.ok) throw new Error('Erro ao atualizar férias.');
+
+      fecharModal('overlay-edit');
+      toast('Férias atualizadas com sucesso!');
+      carregarDados();
+
+    } catch (err) {
+      showMsg('edit-msg', 'error', err.message || 'Erro inesperado.');
+    } finally {
+      setLoading('btn-edit-submit', 'edit-spinner', 'edit-label', false);
+    }
+  };
+
+  // ─────────────────────────────────────────
+  // Deletar Férias
+  // ─────────────────────────────────────────
+  window.deletarFerias = async function(id) {
+    if (!confirm('Tem certeza que deseja remover as férias?')) return;
+
+    try {
+      const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/funcionarios?id=eq.${id}`,
+        {
+          method: 'PATCH',
+          headers: { ...headers, 'Prefer': 'return=minimal' },
+          body: JSON.stringify({
+            inicio_ferias: null,
+            fim_ferias: null,
+          }),
+        }
+      );
+
+      if (!res.ok) throw new Error('Erro ao deletar férias.');
+
+      toast('Férias removida com sucesso!');
+      carregarDados();
+
+    } catch (err) {
+      toast('Erro ao remover férias.');
+    }
+  };
+
+
+
+  // ─────────────────────────────────────────
+  // Sair
+  // ─────────────────────────────────────────
+  window.sair = function() {
+    localStorage.removeItem('sacc_usuario');
+    window.location.href = 'login.html';
+  };
+
+  // Esc fecha modais
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      fecharModal('overlay-add');
+      fecharModal('overlay-edit');
+    }
+  });
+
+  // ─────────────────────────────────────────
+  // Init
+  // ─────────────────────────────────────────
+  carregarDados();
+</script>
+</body>
+</html>
