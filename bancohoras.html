@@ -232,10 +232,16 @@
       font-weight: 600;
       padding: 4px 10px;
       border-radius: 20px;
+      cursor: pointer;
+      transition: all .2s;
     }
     .bh-badge.positivo { background: var(--success-bg); color: var(--success); }
     .bh-badge.neutro   { background: var(--gray-light);  color: var(--gray); }
     .bh-badge.negativo { background: var(--danger-bg);   color: var(--danger); }
+    .bh-badge:hover {
+      transform: scale(1.05);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
 
     .td-action {
       text-align: right;
@@ -258,242 +264,578 @@
       font-family: 'Inter', sans-serif;
       font-size: 12px;
       font-weight: 500;
-      transition: color .15s, background .15s;
+      transition: all .15s;
+      -webkit-tap-highlight-color: transparent;
+      min-height: 44px;
+      min-width: 44px;
+      justify-content: center;
     }
-    .btn-icon.alterar:hover { color: var(--navy); background: #e8eef7; }
+    .btn-icon:hover { background: var(--gray-light); color: var(--navy); }
+    .btn-icon:active { transform: scale(0.95); }
 
-    /* ── Empty / Loading ── */
+    /* ── Empty state ── */
     .empty {
       text-align: center;
-      padding: 52px 24px;
+      padding: 48px 24px;
       color: var(--gray);
     }
-    .empty svg { margin-bottom: 12px; opacity: .35; }
+    .empty svg { margin: 0 auto 12px; color: #cbd5e1; }
     .empty p { font-size: 13px; }
 
-    .loading {
-      text-align: center;
-      padding: 40px;
-      color: var(--gray);
-      font-size: 13px;
-    }
-
-    /* ── Feedback msg ── */
-    .msg {
-      font-size: 12px;
-      margin-top: 10px;
-      padding: 9px 12px;
-      border-radius: 6px;
-      text-align: left;
+    /* ── Modal/Overlay base ── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(2px);
+      z-index: 999;
       display: none;
+      align-items: flex-end;
+      justify-content: center;
+      animation: fadeIn .2s ease-out;
     }
-    .msg.error   { background: var(--danger-bg);  color: var(--danger);  border: 1px solid var(--danger-border);  display: block; }
-    .msg.success { background: var(--success-bg); color: var(--success); border: 1px solid var(--success-border); display: block; }
-    .msg.warning { background: var(--warning-bg); color: var(--warning); border: 1px solid var(--warning-border); display: block; }
+    .modal-overlay.open { display: flex; }
 
-    /* ── Spinner ── */
-    .spinner {
-      width: 14px; height: 14px;
-      border: 2px solid rgba(255,255,255,.4);
-      border-top-color: #fff;
-      border-radius: 50%;
-      animation: spin .6s linear infinite;
-      display: none;
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ── Modal shared ── */
-    .overlay {
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,.32);
-      display: flex; align-items: center; justify-content: center;
-      opacity: 0; pointer-events: none;
-      transition: opacity .2s;
-      z-index: 100;
-    }
-    .overlay.open { opacity: 1; pointer-events: all; }
-
-    .modal {
+    .modal-box {
       background: var(--white);
-      border-radius: 16px;
-      box-shadow: 0 12px 40px rgba(0,0,0,.15);
-      transform: translateY(12px);
-      transition: transform .2s;
-      width: 400px;
-      max-height: 88vh;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
+      border-radius: 16px 16px 0 0;
+      width: 100%;
+      max-width: 480px;
+      max-height: 92vh;
+      overflow-y: auto;
+      animation: slideUp .3s ease-out;
+      position: relative;
     }
-    .overlay.open .modal { transform: translateY(0); }
+
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to   { transform: translateY(0); }
+    }
 
     .modal-header {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 22px 24px 18px 24px;
-      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      background: var(--white);
       border-bottom: 1px solid var(--border);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 10;
     }
-    .modal-header h2 { font-size: 15px; font-weight: 600; color: var(--navy); }
 
-    .modal-body {
-      padding: 22px 24px 24px 24px;
-      overflow-y: auto;
-      flex: 1;
+    .modal-header h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--navy);
     }
 
     .btn-close {
-      background: none; border: none; cursor: pointer;
-      color: var(--gray); padding: 2px;
-      display: flex; align-items: center;
-      transition: color .15s;
-    }
-    .btn-close:hover { color: var(--navy); }
-
-    /* ── Modal funcionário info ── */
-    .modal-func-info {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--gray);
+      padding: 8px;
+      border-radius: 50%;
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 12px 14px;
-      background: var(--gray-light);
-      border-radius: 8px;
+      justify-content: center;
+      transition: all .15s;
+      -webkit-tap-highlight-color: transparent;
+      min-height: 44px;
+      min-width: 44px;
+    }
+    .btn-close:hover { background: var(--gray-light); }
+    .btn-close:active { transform: scale(0.9); }
+
+    .modal-content {
+      padding: 20px;
+    }
+
+    /* ── Modal Histórico ── */
+    .historico-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
       margin-bottom: 20px;
     }
 
-    .modal-func-avatar {
-      width: 38px; height: 38px;
+    .historico-avatar {
+      width: 56px;
+      height: 56px;
       border-radius: 50%;
-      background: #e8eef7;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 15px; font-weight: 700; color: var(--navy);
+      background: var(--navy);
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: 600;
       flex-shrink: 0;
     }
 
-    .modal-func-nome { font-size: 13px; font-weight: 600; color: var(--navy); }
-    .modal-func-sub  { font-size: 11px; color: var(--gray); margin-top: 1px; }
-
-    .modal-func-bh {
-      margin-left: auto;
-      text-align: right;
-    }
-    .modal-func-bh .bh-val {
-      font-size: 20px;
-      font-weight: 700;
+    .historico-info h4 {
+      font-size: 16px;
+      font-weight: 600;
       color: var(--navy);
-      line-height: 1;
+      margin-bottom: 2px;
     }
-    .modal-func-bh .bh-label {
-      font-size: 10px;
+
+    .historico-info p {
+      font-size: 12px;
+      color: var(--gray);
+    }
+
+    /* ── Seletor de Ciclo ── */
+    .ciclo-selector {
+      margin-bottom: 24px;
+    }
+
+    .ciclo-selector label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--navy);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .ciclo-select-wrap {
+      position: relative;
+    }
+
+    .ciclo-select-wrap select {
+      width: 100%;
+      padding: 12px 40px 12px 16px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--navy);
+      background: var(--white);
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      outline: none;
+      transition: all .15s;
+      min-height: 48px;
+    }
+
+    .ciclo-select-wrap select:focus {
+      border-color: var(--navy);
+      box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.1);
+    }
+
+    .ciclo-select-wrap::after {
+      content: '';
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 0;
+      height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 5px solid var(--navy);
+      pointer-events: none;
+    }
+
+    /* ── Resumo do Saldo ── */
+    .saldo-resumo {
+      background: var(--gray-light);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .saldo-item {
+      text-align: center;
+      flex: 1;
+    }
+
+    .saldo-item:not(:last-child) {
+      border-right: 1px solid var(--border);
+    }
+
+    .saldo-label {
+      font-size: 11px;
       color: var(--gray);
       text-transform: uppercase;
-      letter-spacing: .5px;
-      margin-top: 2px;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+      margin-bottom: 6px;
     }
 
-    /* ── Form fields ── */
-    .field { margin-bottom: 14px; text-align: left; }
-    .field label {
-      display: block; font-size: 12px; font-weight: 500;
-      color: var(--navy); margin-bottom: 6px;
+    .saldo-valor {
+      font-size: 22px;
+      font-weight: 700;
     }
-    .field input, .field textarea, .field select {
+
+    .saldo-valor.positivo { color: var(--success); }
+    .saldo-valor.neutro { color: var(--gray); }
+    .saldo-valor.negativo { color: var(--danger); }
+
+    /* ── Timeline de Movimentações ── */
+    .movimentacoes-titulo {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--gray);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 16px;
+    }
+
+    .movimentacao-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      transition: all .2s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .movimentacao-card:active {
+      transform: scale(0.98);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .mov-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 10px;
+    }
+
+    .mov-tipo {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .mov-tipo.credito {
+      background: var(--success-bg);
+      color: var(--success);
+    }
+
+    .mov-tipo.debito {
+      background: var(--danger-bg);
+      color: var(--danger);
+    }
+
+    .mov-horas {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .mov-horas.credito { color: var(--success); }
+    .mov-horas.debito { color: var(--danger); }
+
+    .mov-descricao {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--navy);
+      margin-bottom: 8px;
+      line-height: 1.4;
+    }
+
+    .mov-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 10px;
+      border-top: 1px solid var(--gray-light);
+    }
+
+    .mov-data {
+      font-size: 11px;
+      color: var(--gray);
+    }
+
+    .mov-saldo {
+      font-size: 11px;
+      color: var(--gray);
+      font-weight: 500;
+    }
+
+    .mov-saldo strong {
+      color: var(--navy);
+      font-weight: 600;
+    }
+
+    .mov-observacao {
+      font-size: 12px;
+      color: var(--gray);
+      font-style: italic;
+      margin-top: 8px;
+      padding: 8px 12px;
+      background: var(--gray-light);
+      border-radius: 6px;
+    }
+
+    /* ── Estado vazio ── */
+    .historico-empty {
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--gray);
+    }
+
+    .historico-empty svg {
+      margin: 0 auto 12px;
+      color: #cbd5e1;
+    }
+
+    .historico-empty p {
+      font-size: 13px;
+    }
+
+    /* ── Botões de ação ── */
+    .btn-primary {
       width: 100%;
-      padding: 10px 13px;
+      padding: 14px;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .15s;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 48px;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .btn-primary.navy {
+      background: var(--navy);
+      color: var(--white);
+    }
+
+    .btn-primary.navy:hover {
+      background: var(--navy-light);
+    }
+
+    .btn-primary.green {
+      background: var(--success);
+      color: var(--white);
+    }
+
+    .btn-primary.green:hover {
+      background: #15803d;
+    }
+
+    .btn-primary:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .spinner {
+      display: none;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: var(--white);
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ── Mensagens ── */
+    .msg {
+      display: none;
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 13px;
+    }
+
+    .msg.error {
+      display: block;
+      background: var(--danger-bg);
+      color: var(--danger);
+      border: 1px solid var(--danger-border);
+    }
+
+    .msg.success {
+      display: block;
+      background: var(--success-bg);
+      color: var(--success);
+      border: 1px solid var(--success-border);
+    }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--navy);
+      color: var(--white);
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      opacity: 0;
+      transition: all .3s ease-out;
+      z-index: 9999;
+      max-width: 90%;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    /* ── Modal Adicionar Movimentação ── */
+    .field {
+      margin-bottom: 16px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--navy);
+      margin-bottom: 6px;
+    }
+
+    .field input,
+    .field textarea,
+    .field select {
+      width: 100%;
+      padding: 12px;
       border: 1px solid var(--border);
       border-radius: 6px;
       font-family: 'Inter', sans-serif;
-      font-size: 13px;
+      font-size: 14px;
       color: var(--navy);
       background: var(--white);
       outline: none;
       transition: border-color .15s;
+      min-height: 48px;
     }
-    .field input::placeholder,
-    .field textarea::placeholder { color: #b0bac8; }
+
+    .field textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
     .field input:focus,
     .field textarea:focus,
-    .field select:focus { border-color: var(--navy); }
-    .field textarea { resize: vertical; min-height: 72px; }
-
-    .field-hint {
-      font-size: 11px;
-      color: var(--gray);
-      margin-top: 4px;
+    .field select:focus {
+      border-color: var(--navy);
     }
 
-    /* ── Botões modais ── */
-    .btn-primary {
-      width: 100%; margin-top: 6px; padding: 11px;
-      border: none; border-radius: 6px;
-      font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600;
-      cursor: pointer;
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-      transition: background .15s;
-      color: #fff;
-    }
-    .btn-primary.green { background: var(--success); }
-    .btn-primary.green:hover { background: #15803d; }
-    .btn-primary.red   { background: var(--danger); }
-    .btn-primary.red:hover   { background: #b91c1c; }
-    .btn-primary:disabled { opacity: .6; cursor: not-allowed; }
-
-    /* ── Histórico ── */
-    .historico-titulo {
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--gray);
-      letter-spacing: .6px;
-      text-transform: uppercase;
-      margin-bottom: 10px;
-      margin-top: 20px;
-    }
-
-    .historico-lista {
-      list-style: none;
+    .radio-group {
       display: flex;
-      flex-direction: column;
-      gap: 6px;
-      max-height: 160px;
-      overflow-y: auto;
-      scrollbar-width: thin;
-      scrollbar-color: #d1dae6 transparent;
+      gap: 12px;
     }
 
-    .historico-item {
+    .radio-option {
+      flex: 1;
+      position: relative;
+    }
+
+    .radio-option input {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .radio-label {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      padding: 8px 10px;
-      border-radius: 6px;
-      font-size: 12px;
-      background: var(--gray-light);
+      justify-content: center;
+      padding: 12px;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .15s;
+      min-height: 48px;
+      -webkit-tap-highlight-color: transparent;
     }
 
-    .historico-item .hi-desc { color: var(--navy); font-weight: 500; flex: 1; }
-    .historico-item .hi-data { color: var(--gray); font-size: 11px; margin: 0 10px; white-space: nowrap; }
-    .historico-item .hi-val  { font-weight: 700; white-space: nowrap; }
-    .historico-item.entrada .hi-val { color: var(--success); }
-    .historico-item.saida   .hi-val { color: var(--danger); }
-    .historico-vazio { font-size: 12px; color: var(--gray); text-align: center; padding: 14px 0; }
-
-    /* ── Toast ── */
-    .toast {
-      position: fixed; bottom: 24px; right: 24px;
-      background: var(--navy); color: #fff;
-      font-size: 13px; padding: 11px 18px;
-      border-radius: 7px;
-      box-shadow: 0 4px 16px rgba(0,0,0,.15);
-      opacity: 0; transform: translateY(8px);
-      transition: opacity .2s, transform .2s;
-      pointer-events: none;
-      z-index: 999;
+    .radio-option input:checked + .radio-label {
+      border-color: var(--navy);
+      background: #e8eef7;
+      color: var(--navy);
     }
-    .toast.show { opacity: 1; transform: translateY(0); }
+
+    /* ── Responsividade Desktop ── */
+    @media (min-width: 768px) {
+      .modal-overlay {
+        align-items: center;
+      }
+
+      .modal-box {
+        border-radius: 16px;
+        max-height: 85vh;
+      }
+
+      .btn-icon:hover {
+        background: var(--gray-light);
+        color: var(--navy);
+      }
+    }
+
+    /* ── Mobile-specific adjustments ── */
+    @media (max-width: 767px) {
+      .topbar {
+        padding: 0 16px;
+      }
+
+      .content {
+        margin: 20px auto;
+        padding: 0 16px;
+      }
+
+      .table-wrap {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      table {
+        min-width: 600px;
+      }
+    }
   </style>
 </head>
 <body>
 
-<!-- ── Topbar ── -->
+<!-- Topbar -->
 <div class="topbar">
   <div class="topbar-left">
     <span class="logo">SACC</span>
@@ -504,12 +846,14 @@
       <a href="dashboard.html" class="nav-link">Funcionários</a>
       <a href="bancohoras.html" class="nav-link active">Banco de Horas</a>
       <a href="ferias.html" class="nav-link">Férias</a>
-	  <a href="escala.html" class="nav-link">Escala</a>
-	  <a href="levantamentos.html" class="nav-link">Levantamentos</a>
+      <a href="escala.html" class="nav-link">Escala</a>
+      <a href="levantamentos.html" class="nav-link">Levantamentos</a>
     </nav>
   </div>
   <div class="topbar-right">
-    <span class="topbar-user">Olá, <strong id="topbar-nome">—</strong></span>
+    <div class="topbar-user">
+      Usuário: <strong id="topbar-nome">—</strong>
+    </div>
     <button class="btn-sair-top" onclick="sair()">Sair</button>
   </div>
 </div>
@@ -524,7 +868,9 @@
   </div>
 
   <div class="search-wrap">
-    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+    </svg>
     <input id="search-input" type="text" placeholder="Buscar por nome, matrícula ou setor..." oninput="filtrarTabela()"/>
   </div>
 
@@ -540,44 +886,77 @@
         </tr>
       </thead>
       <tbody id="tabela-body">
-        <tr><td colspan="5"><div class="loading">Carregando funcionários...</div></td></tr>
+        <tr>
+          <td colspan="5">
+            <div class="empty">
+              <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+              </svg>
+              <p>Carregando...</p>
+            </div>
+          </td>
+        </tr>
       </tbody>
     </table>
   </div>
 </div>
 
-<!-- ── Modal: Alterar Banco de Horas ── -->
-<div class="overlay" id="overlay-alterar" onclick="fecharFora(event,'overlay-alterar')">
-  <div class="modal">
+<!-- ── Modal Banco de Horas ── -->
+<div class="modal-overlay" id="overlay-historico" onclick="fecharFora(event, 'overlay-historico')">
+  <div class="modal-box">
     <div class="modal-header">
-      <h2>Alterar Banco de Horas</h2>
-      <button class="btn-close" onclick="fecharModal('overlay-alterar')">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      <div>
+        <h3 id="hist-nome">Banco de Horas</h3>
+        <p id="hist-sub" style="font-size:12px;color:var(--gray);margin-top:2px;"></p>
+      </div>
+      <button class="btn-close" onclick="fecharModal('overlay-historico')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
       </button>
     </div>
-    <div class="modal-body">
-      <div class="modal-func-info">
-        <div class="modal-func-avatar" id="alterar-avatar">—</div>
-        <div>
-          <div class="modal-func-nome" id="alterar-nome">—</div>
-          <div class="modal-func-sub"  id="alterar-sub">—</div>
+
+    <div class="modal-content">
+
+      <!-- Formulário: ciclo + horas + salvar -->
+      <div style="display:flex;flex-direction:column;gap:12px;padding:16px;background:var(--gray-light);border-radius:10px;margin-bottom:24px;">
+
+        <div class="ciclo-select-wrap">
+          <select id="ciclo-select" onchange="carregarHistoricoCiclo()">
+            <option value="">Selecione um ciclo...</option>
+          </select>
         </div>
-        <div class="modal-func-bh">
-          <div class="bh-val"   id="alterar-bh-val">0h</div>
-          <div class="bh-label">Saldo atual</div>
+
+        <div style="display:flex;gap:10px;align-items:center;">
+          <div style="position:relative;flex:1;">
+            <input id="mov-horas" type="text" inputmode="numeric" placeholder="HH:MM:SS (ex: 120:30:45)"
+              style="width:100%;padding:12px 14px 12px 40px;border:1px solid var(--border);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;font-weight:500;color:var(--navy);background:var(--white);outline:none;transition:border-color .15s;"/>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#b0bac8;pointer-events:none;">
+              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
+          </div>
+          <button class="btn-primary navy" id="btn-salvar-ciclo" onclick="handleSalvarCiclo()"
+            style="width:auto;padding:12px 20px;white-space:nowrap;flex-shrink:0;">
+            <span class="spinner" id="salvar-spinner"></span>
+            <span id="salvar-label">Salvar</span>
+          </button>
+        </div>
+
+        <div class="msg" id="salvar-msg"></div>
+      </div>
+
+      <!-- Histórico de ciclos -->
+      <div class="movimentacoes-titulo">Histórico por ciclo</div>
+      <div id="movimentacoes-container">
+        <div class="historico-empty">
+          <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <p>Nenhum registro encontrado.</p>
         </div>
       </div>
 
-      <div class="field">
-        <label for="alterar-horas">Novo valor de horas</label>
-        <input id="alterar-horas" type="number" step="0.5" placeholder="Ex: 8"/>
-      </div>
-
-      <button class="btn-primary green" id="btn-alterar-submit" onclick="handleAlterarBanco()">
-        <span class="spinner" id="alterar-spinner"></span>
-        <span id="alterar-label">Salvar</span>
-      </button>
-      <div class="msg" id="alterar-msg"></div>
     </div>
   </div>
 </div>
@@ -613,6 +992,8 @@
   // ─────────────────────────────────────────
   let funcionarios = [];
   let funcionarioSelecionadoId = null;
+  let cicloSelecionado = null;
+  let todoHistorico = [];
 
   // ─────────────────────────────────────────
   // Utilitários
@@ -641,12 +1022,12 @@
     setTimeout(() => el.classList.remove('show'), 2800);
   }
 
-  function fecharModal(id) {
+  window.fecharModal = function(id) {
     document.getElementById(id).classList.remove('open');
   }
 
-  function fecharFora(e, id) {
-    if (e.target.id === id) fecharModal(id);
+  window.fecharFora = function(e, id) {
+    if (e.target.id === id) window.fecharModal(id);
   }
 
   function inicialNome(nome) {
@@ -657,16 +1038,123 @@
       : partes[0][0].toUpperCase();
   }
 
+  // Converte "10:30:45" → total de segundos
+  function hhmmss2sec(val) {
+    if (!val) return null;
+    const str = String(val).trim();
+    const m = str.match(/^(-?)(\d+):(\d{2}):(\d{2})$/);
+    if (!m) return null;
+    const neg = m[1] === '-';
+    const secs = parseInt(m[2]) * 3600 + parseInt(m[3]) * 60 + parseInt(m[4]);
+    return neg ? -secs : secs;
+  }
+
+  // Converte segundos → "10h30m45s" para exibição
+  function sec2display(secs) {
+    if (secs === null || secs === undefined || isNaN(secs)) return '—';
+    const neg = secs < 0;
+    const abs = Math.abs(secs);
+    const h = Math.floor(abs / 3600);
+    const m = Math.floor((abs % 3600) / 60);
+    const s = abs % 60;
+    const sign = neg ? '-' : (secs > 0 ? '+' : '');
+    let str = `${sign}${h}h`;
+    if (m > 0 || s > 0) str += `${String(m).padStart(2,'0')}m`;
+    if (s > 0) str += `${String(s).padStart(2,'0')}s`;
+    return str;
+  }
+
+  // Converte segundos → "HH:MM:SS" para preencher o input
+  function sec2hhmmss(secs) {
+    if (secs === null || secs === undefined || isNaN(secs)) return '';
+    const neg = secs < 0;
+    const abs = Math.abs(secs);
+    const h = Math.floor(abs / 3600);
+    const m = Math.floor((abs % 3600) / 60);
+    const s = abs % 60;
+    return `${neg?'-':''}${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  }
+
+
   function formatarBH(val) {
-    if (val === null || val === undefined) return '—';
+    if (val === null || val === undefined || val === '') return '—';
+    if (typeof val === 'string' && val.match(/^\d+:\d{2}:\d{2}$/)) {
+      const secs = hhmmss2sec(val);
+      return secs !== null ? sec2display(secs) : val;
+    }
+    // fallback legado HH:MM ou numérico
     const v = parseFloat(val);
-    if (isNaN(v)) return '—';
-    return `${v > 0 ? '+' : ''}${v}h`;
+    if (!isNaN(v)) return `${v > 0 ? '+' : ''}${v}h`;
+    return val;
   }
 
   function badgeClass(val) {
-    if (val === null || val === undefined || val === 0) return 'neutro';
-    return parseFloat(val) > 0 ? 'positivo' : 'negativo';
+    if (val === null || val === undefined || val === '') return 'neutro';
+    let n;
+    if (typeof val === 'string' && val.match(/^\d+:\d{2}:\d{2}$/)) {
+      n = hhmmss2sec(val);
+    } else {
+      n = parseFloat(val);
+    }
+    if (n === null || isNaN(n) || n === 0) return 'neutro';
+    return n > 0 ? 'positivo' : 'negativo';
+  }
+
+  function formatarData(isoString) {
+    const data = new Date(isoString);
+    return data.toLocaleDateString('pt-BR', { 
+      day: '2-digit', 
+      month: '2-digit', 
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
+
+  // ─────────────────────────────────────────
+  // 📅 CÁLCULO DE CICLOS (dia 21 ao dia 20)
+  // ─────────────────────────────────────────
+  function calcularCicloAtual() {
+    const hoje = new Date();
+    const dia = hoje.getDate();
+    const mes = hoje.getMonth(); // 0-11
+    const ano = hoje.getFullYear();
+
+    let cicloInicio, cicloFim;
+
+    if (dia >= 21) {
+      // Ciclo atual: 21 deste mês até 20 do próximo
+      cicloInicio = new Date(ano, mes, 21);
+      cicloFim = new Date(ano, mes + 1, 20);
+    } else {
+      // Ciclo atual: 21 do mês passado até 20 deste mês
+      cicloInicio = new Date(ano, mes - 1, 21);
+      cicloFim = new Date(ano, mes, 20);
+    }
+
+    return {
+      inicio: cicloInicio.toISOString().split('T')[0],
+      fim: cicloFim.toISOString().split('T')[0]
+    };
+  }
+
+  function gerarCiclosDisponiveis(mesesParaTras = 6) {
+    const ciclos = [];
+    const hoje = new Date();
+    
+    for (let i = 0; i <= mesesParaTras; i++) {
+      const data = new Date(hoje.getFullYear(), hoje.getMonth() - i, 21);
+      const cicloInicio = new Date(data.getFullYear(), data.getMonth(), 21);
+      const cicloFim = new Date(data.getFullYear(), data.getMonth() + 1, 20);
+      
+      ciclos.push({
+        inicio: cicloInicio.toISOString().split('T')[0],
+        fim: cicloFim.toISOString().split('T')[0],
+        label: `${cicloInicio.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })} até ${cicloFim.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })}`
+      });
+    }
+    
+    return ciclos;
   }
 
   // ─────────────────────────────────────────
@@ -675,17 +1163,23 @@
   async function carregarFuncionarios() {
     try {
       const res = await fetch(
-        `${SUPABASE_URL}/rest/v1/funcionarios?select=id,nome,matricula,setor,bancohoras&order=nome.asc`,
+        `${SUPABASE_URL}/rest/v1/funcionarios?select=id,nome,matricula,setor,banco_horas&order=nome`,
         { headers }
       );
-      if (!res.ok) throw new Error();
+      if (!res.ok) {
+        const errBody = await res.text();
+        console.error('Supabase erro', res.status, errBody);
+        throw new Error(`Erro ${res.status}: ${errBody}`);
+      }
       funcionarios = await res.json();
       renderTabela(funcionarios);
       document.getElementById('count-label').textContent =
         `${funcionarios.length} funcionário${funcionarios.length !== 1 ? 's' : ''} cadastrado${funcionarios.length !== 1 ? 's' : ''}`;
-    } catch {
+    } catch (err) {
+      console.error('carregarFuncionarios:', err);
       document.getElementById('tabela-body').innerHTML =
-        `<tr><td colspan="5"><div class="empty"><p>Erro ao carregar. Tente novamente.</p></div></td></tr>`;
+        `<tr><td colspan="5"><div class="empty"><p>Erro ao carregar: ${err.message || 'verifique o console para detalhes.'}</p></div></td></tr>`;
+      document.getElementById('count-label').textContent = 'Erro ao carregar';
     }
   }
 
@@ -702,20 +1196,26 @@
     }
 
     tbody.innerHTML = lista.map(f => {
-      const bh  = f.bancohoras ?? 0;
+      const bh  = f.banco_horas ?? 0;
       const cls = badgeClass(bh);
-      const bhStr = (bh === null || bh === undefined) ? '—' : `${bh > 0 ? '+' : ''}${bh}h`;
+      const bhStr = formatarBH(bh);
       return `
         <tr>
           <td class="td-matricula">${f.matricula || '—'}</td>
           <td>${f.nome}</td>
           <td><span class="td-setor">${f.setor || '—'}</span></td>
-          <td><span class="bh-badge ${cls}">${bhStr}</span></td>
+          <td>
+            <span class="bh-badge ${cls}" onclick="abrirHistorico('${f.id}')" title="Clique para ver o histórico">
+              ${bhStr}
+            </span>
+          </td>
           <td>
             <div class="td-action">
-              <button class="btn-icon alterar" onclick="abrirAlterar('${f.id}')" title="Alterar Banco de Horas">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                Alterar Banco
+              <button class="btn-icon" onclick="abrirHistorico('${f.id}')" title="Ver Histórico">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/>
+                </svg>
+                Histórico
               </button>
             </div>
           </td>
@@ -737,64 +1237,222 @@
   };
 
   // ─────────────────────────────────────────
-  // Abrir modal Alterar
+  // 🕒 ABRIR MODAL
   // ─────────────────────────────────────────
-  window.abrirAlterar = function(id) {
+  window.abrirHistorico = async function(id) {
     const f = funcionarios.find(x => String(x.id) === String(id));
     if (!f) return;
+
     funcionarioSelecionadoId = f.id;
 
-    document.getElementById('alterar-avatar').textContent = inicialNome(f.nome);
-    document.getElementById('alterar-nome').textContent   = f.nome;
-    document.getElementById('alterar-sub').textContent    = `${f.matricula || '—'} · ${f.setor || '—'}`;
+    // Preencher header
+    document.getElementById('hist-nome').textContent = f.nome;
+    document.getElementById('hist-sub').textContent = `${f.matricula || '—'} · ${f.setor || '—'}`;
 
-    const bh = f.bancohoras ?? 0;
-    document.getElementById('alterar-bh-val').textContent = `${bh > 0 ? '+' : ''}${bh}h`;
+    // Gerar opções de ciclo
+    const ciclos = gerarCiclosDisponiveis();
+    const select = document.getElementById('ciclo-select');
+    select.innerHTML = ciclos.map(c =>
+      `<option value="${c.inicio}|${c.fim}">${c.label}</option>`
+    ).join('');
 
-    document.getElementById('alterar-horas').value = bh || '';
-    hideMsg('alterar-msg');
+    // Selecionar ciclo atual
+    const cicloAtual = calcularCicloAtual();
+    select.value = `${cicloAtual.inicio}|${cicloAtual.fim}`;
 
-    document.getElementById('overlay-alterar').classList.add('open');
-    document.getElementById('alterar-horas').focus();
+    // Limpar input e msg
+    document.getElementById('mov-horas').value = '';
+    hideMsg('salvar-msg');
+
+    // Carregar histórico completo do funcionário
+    await carregarHistoricoCompleto();
+
+    // Pré-preencher horas do ciclo selecionado (se existir)
+    preencherHorasCiclo();
+
+    document.getElementById('overlay-historico').classList.add('open');
   };
 
   // ─────────────────────────────────────────
-  // Alterar Banco de Horas
+  // 📊 CARREGAR TODO O HISTÓRICO DO FUNCIONÁRIO
   // ─────────────────────────────────────────
-  window.handleAlterarBanco = async function() {
-    const novoValor = parseFloat(document.getElementById('alterar-horas').value);
-    hideMsg('alterar-msg');
+  async function carregarHistoricoCompleto() {
+    try {
+      const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/banco_horas_historico?funcionario_id=eq.${funcionarioSelecionadoId}&order=ciclo_inicio.desc.nullslast`,
+        { headers }
+      );
+      if (!res.ok) {
+        const errBody = await res.text();
+        console.error('Supabase erro historico', res.status, errBody);
+        throw new Error(`Erro ${res.status}: ${errBody}`);
+      }
+      todoHistorico = await res.json();
+      renderHistorico();
+    } catch (err) {
+      console.error(err);
+      document.getElementById('movimentacoes-container').innerHTML =
+        `<div class="historico-empty"><p>Erro ao carregar histórico.</p></div>`;
+    }
+  }
 
-    if (isNaN(novoValor)) {
-      showMsg('alterar-msg', 'error', 'Informe um valor de horas válido.');
+  // ─────────────────────────────────────────
+  // 📊 CARREGAR CICLO SELECIONADO (ao trocar select)
+  // ─────────────────────────────────────────
+  window.carregarHistoricoCiclo = function() {
+    hideMsg('salvar-msg');
+    preencherHorasCiclo();
+  };
+
+  function preencherHorasCiclo() {
+    const select = document.getElementById('ciclo-select');
+    const [inicio, fim] = select.value.split('|');
+    if (!inicio || !fim) return;
+    cicloSelecionado = { inicio, fim };
+
+    const registro = todoHistorico.find(r => r.ciclo_inicio === inicio && r.ciclo_fim === fim);
+    // Preenche input com o valor salvo em HH:MM
+    document.getElementById('mov-horas').value = registro ? (registro.saldo_final || '') : '';
+    document.getElementById('salvar-label').textContent = registro ? 'Alterar' : 'Adicionar';
+  }
+
+  // ─────────────────────────────────────────
+  // 🎨 RENDERIZAR HISTÓRICO
+  // ─────────────────────────────────────────
+  function renderHistorico() {
+    const container = document.getElementById('movimentacoes-container');
+
+    if (!todoHistorico || todoHistorico.length === 0) {
+      container.innerHTML = `
+        <div class="historico-empty">
+          <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          <p>Nenhum registro encontrado.</p>
+        </div>`;
       return;
     }
 
-    setLoading('btn-alterar-submit', 'alterar-spinner', 'alterar-label', true);
+    container.innerHTML = todoHistorico.map(r => {
+      const cls = badgeClass(r.saldo_final);
+      const inicio = new Date(r.ciclo_inicio + 'T12:00:00');
+      const fim    = new Date(r.ciclo_fim    + 'T12:00:00');
+      const fmtDate = d => d.toLocaleDateString('pt-BR', { day:'2-digit', month:'short', year:'numeric' });
+      const atualizadoEm = r.updated_at || r.created_at;
+      return `
+        <div class="movimentacao-card">
+          <div class="mov-header">
+            <span class="mov-tipo" style="background:var(--gray-light);color:var(--gray);">
+              ${fmtDate(inicio)} – ${fmtDate(fim)}
+            </span>
+            <span class="mov-horas ${cls}" style="color:${cls==='positivo'?'var(--success)':cls==='negativo'?'var(--danger)':'var(--gray)'}">
+              ${formatarBH(r.saldo_final)}
+            </span>
+          </div>
+          ${atualizadoEm ? `<div class="mov-data" style="margin-top:6px;">Atualizado em ${formatarData(atualizadoEm)}</div>` : ''}
+        </div>`;
+    }).join('');
+  }
+
+  // ─────────────────────────────────────────
+  // 💾 SALVAR (ADD OU ALTERAR)
+  // ─────────────────────────────────────────
+  window.handleSalvarCiclo = async function() {
+    const rawVal = document.getElementById('mov-horas').value.trim();
+    hideMsg('salvar-msg');
+
+    // Validar formato HH:MM:SS
+    if (!rawVal || !/^\d+:\d{2}:\d{2}$/.test(rawVal)) {
+      showMsg('salvar-msg', 'error', 'Informe o valor no formato HH:MM:SS (ex: 10:30:00).');
+      return;
+    }
+    const secs = hhmmss2sec(rawVal);
+    if (secs === null) {
+      showMsg('salvar-msg', 'error', 'Formato inválido. Use HH:MM:SS (ex: 10:30:00).');
+      return;
+    }
+    if (!cicloSelecionado) {
+      showMsg('salvar-msg', 'error', 'Selecione um ciclo.');
+      return;
+    }
+
+    // Normaliza para HH:MM:SS canônico antes de salvar
+    const valorSalvar = sec2hhmmss(secs);
+
+    setLoading('btn-salvar-ciclo', 'salvar-spinner', 'salvar-label', true);
 
     try {
-      const f = funcionarios.find(x => String(x.id) === String(funcionarioSelecionadoId));
-
-      const res = await fetch(
-        `${SUPABASE_URL}/rest/v1/funcionarios?id=eq.${funcionarioSelecionadoId}`,
-        {
-          method: 'PATCH',
-          headers: { ...headers, 'Prefer': 'return=minimal' },
-          body: JSON.stringify({ bancohoras: novoValor }),
-        }
+      const registroExistente = todoHistorico.find(
+        r => r.ciclo_inicio === cicloSelecionado.inicio && r.ciclo_fim === cicloSelecionado.fim
       );
-      if (!res.ok) throw new Error('Erro ao atualizar saldo.');
 
-      f.bancohoras = novoValor;
+      if (registroExistente) {
+        const res = await fetch(
+          `${SUPABASE_URL}/rest/v1/banco_horas_historico?id=eq.${registroExistente.id}`,
+          {
+            method: 'PATCH',
+            headers: { ...headers, 'Prefer': 'return=representation' },
+            body: JSON.stringify({ saldo_final: valorSalvar })
+          }
+        );
+        if (!res.ok) {
+          const errBody = await res.text();
+          console.error('Supabase PATCH erro', res.status, errBody);
+          throw new Error(`Erro ao atualizar registro: ${errBody}`);
+        }
+        const data = await res.json();
+        const idx = todoHistorico.findIndex(r => r.id === registroExistente.id);
+        todoHistorico[idx] = data[0];
+      } else {
+        const payload = {
+          funcionario_id: funcionarioSelecionadoId,
+          ciclo_inicio: cicloSelecionado.inicio,
+          ciclo_fim: cicloSelecionado.fim,
+          saldo_final: valorSalvar
+        };
+        const res = await fetch(
+          `${SUPABASE_URL}/rest/v1/banco_horas_historico`,
+          {
+            method: 'POST',
+            headers: { ...headers, 'Prefer': 'return=representation' },
+            body: JSON.stringify(payload)
+          }
+        );
+        if (!res.ok) {
+          const errBody = await res.text();
+          console.error('Supabase POST erro', res.status, errBody);
+          throw new Error(`Erro ao criar registro: ${errBody}`);
+        }
+        const data = await res.json();
+        todoHistorico.unshift(data[0]);
+      }
 
-      fecharModal('overlay-alterar');
-      toast(`Banco de horas alterado para ${novoValor}h.`);
-      renderTabela(funcionarios);
+      // Atualizar banco_horas do funcionário
+      const f = funcionarios.find(x => String(x.id) === String(funcionarioSelecionadoId));
+      if (f) {
+        const res = await fetch(
+          `${SUPABASE_URL}/rest/v1/funcionarios?id=eq.${funcionarioSelecionadoId}`,
+          {
+            method: 'PATCH',
+            headers: { ...headers, 'Prefer': 'return=minimal' },
+            body: JSON.stringify({ banco_horas: valorSalvar })
+          }
+        );
+        if (!res.ok) throw new Error('Erro ao atualizar saldo do funcionário');
+        f.banco_horas = valorSalvar;
+        renderTabela(funcionarios);
+      }
+
+      renderHistorico();
+      preencherHorasCiclo();
+      toast('Banco de horas salvo com sucesso!');
 
     } catch (err) {
-      showMsg('alterar-msg', 'error', err.message || 'Erro inesperado.');
+      console.error(err);
+      showMsg('salvar-msg', 'error', err.message || 'Erro ao salvar.');
     } finally {
-      setLoading('btn-alterar-submit', 'alterar-spinner', 'alterar-label', false);
+      setLoading('btn-salvar-ciclo', 'salvar-spinner', 'salvar-label', false);
+      preencherHorasCiclo();
     }
   };
 
@@ -808,9 +1466,7 @@
 
   // Esc fecha modais
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') {
-      fecharModal('overlay-alterar');
-    }
+    if (e.key === 'Escape') fecharModal('overlay-historico');
   });
 
   // ─────────────────────────────────────────
